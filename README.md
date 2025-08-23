@@ -18,3 +18,4 @@ While GOAP implementations for Unity exist, I wanted to make my own to further a
 
 ```DefaultActionConfig.cs``` uses ```[SerializeReference]``` to serialize an interface. Unity does not support this by default, so unless you have Odin inspector or a custom editor for interface serialization, you will not be able to use the default action config. In a complete version of this asset, I anticipate some work-around for this.
 
+Also, please read ```REQUIREMENTS.md```
