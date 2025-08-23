@@ -1,7 +1,7 @@
 # GOAP
 A Goal-Oriented Action Planning AI framework made for Unity development and ease of access with Scriptable Objects.
 
-This GitHub page is still under major development.
+!! This GitHub page is still under **major development** !!
 
 While GOAP implementations for Unity exist, I wanted to make my own to further advance my understanding in the algorithm and to provide features some of the other implementations didnt provide.
 
@@ -9,8 +9,10 @@ While GOAP implementations for Unity exist, I wanted to make my own to further a
   * Everything about this implementation uses Scriptable Objects, making modifications and adjustments extremely simple.
 * Flexible Conditions
   * Conditions can use all logical operators.
+* Configuration
+  * Every GOAP-Agent has a mandatory configuration Scriptable Object that initialized the Agent's knowledge about the world. This neatly groups all sensor logic into one place.
  
-Eventually, I will add a guide to this page explaining how to use all features. 
+*Eventually, I will add a guide to this page explaining how to use all features.*
 
 # WARNING
 
