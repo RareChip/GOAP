@@ -6,11 +6,13 @@ namespace GOAP.goap
 {
     public sealed class GoapAction
     {
-        private HashSet<GoapCondition> conditions;
-        private HashSet<GoapEffect> effects;
+        public string ActionName { get; private set; }
+        public HashSet<GoapCondition> Conditions { get; private set; }
+        public HashSet<GoapEffect> Effects { get; private set; }
+        
         private IActionStrategy actionStrategy;
         private Func<WorldState, float> calculateCost;
-
+        
         public float CalculateCost(WorldState worldState) => calculateCost(worldState);
         
         public void StartAction() => actionStrategy.Start();
