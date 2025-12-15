@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using GOAP.Core.Agent;
 
-namespace GOAP.goap
+namespace GOAP.Core
 {
     public sealed class GoapAction
     {
@@ -11,12 +11,13 @@ namespace GOAP.goap
         public HashSet<GoapEffect> Effects { get; private set; }
         
         private IActionStrategy actionStrategy;
-        private Func<WorldState, float> calculateCost;
+        private Func<WorldState, int> calculateCost;
         
-        public float CalculateCost(WorldState worldState) => calculateCost(worldState);
+        public int CalculateCost(WorldState worldState) => calculateCost(worldState);
         
         public void StartAction() => actionStrategy.Start();
         public void ExecuteAction() => actionStrategy.Execute();
         public void StopAction() => actionStrategy.Stop();
+        
     }
 }

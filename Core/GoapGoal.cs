@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace GOAP.goap
+namespace GOAP.Core
 {
     public sealed class GoapGoal
     {
         private string goalName;
-        private HashSet<GoapCondition> preconditions;
+        public HashSet<GoapCondition> Conditions;
         private Func<float> calculateInsistence;
     }
 }
