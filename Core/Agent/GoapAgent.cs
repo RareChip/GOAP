@@ -16,9 +16,9 @@ namespace GOAP.Core.Agent
         private ActionPlan currentPlan;
         private void Awake()
         {
-            actions = goapConfiguration.CreateActions();
-            goals = goapConfiguration.CreateGoals();
             worldState = goapConfiguration.CreateWorldState();
+            actions = goapConfiguration.CreateActions(new GoapActionBuilder());
+            goals = goapConfiguration.CreateGoals();
             planner = new GoapPlanner();
         }
 

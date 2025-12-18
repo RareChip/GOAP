@@ -18,6 +18,7 @@ namespace GOAP.Core.Planning
         // implementation will use Utility AI
         public GoapGoal GenerateBestGoal(HashSet<GoapGoal> goals)
         {
+            
             return null;
         }
 
@@ -26,43 +27,52 @@ namespace GOAP.Core.Planning
             PriorityQueue<PlannerNode, int> priorityQueue = new PriorityQueue<PlannerNode, int>();
             HashSet<PlannerNode> visitedNodes = new HashSet<PlannerNode>();
             
-            PlannerNode startingNode = new PlannerNode(goal.Conditions.ToArray(), null);
+            PlannerNode startingNode = new PlannerNode(new HashSet<GoapCondition>(goal.Conditions), null);
             priorityQueue.Enqueue(startingNode, 0);
 
             while (priorityQueue.Count > 0)
             {
                 PlannerNode current = priorityQueue.Dequeue();
-                int conditionsUnsatisfied = 0;
 
                 if (!visitedNodes.Add(current))
                 {
                     continue;
                 }
 
+                HashSet<GoapCondition> unsatisfiedConditions = new HashSet<GoapCondition>();
+
                 foreach (GoapCondition condition in current.Conditions)
                 {
                     if (GoapResolver.ConditionIsSatisfied(condition, plannerState))
                         continue;
 
-                    conditionsUnsatisfied++;
-                    //Otherwise, find all actions that satisfy this condition.
-                    PlannerState newState = plannerState.Clone();
-                    foreach (GoapAction action in actions)
-                    {
-                        foreach (GoapEffect effect in action.Effects)
-                        {
-                            if (!string.Equals(effect.Key, condition.Key, StringComparison.CurrentCultureIgnoreCase))
-                                continue;
-                            
-                            
-                        }
-                    }
-                    
+                    unsatisfiedConditions.Add(condition);
                 }
 
-                if (conditionsUnsatisfied == 0)
+                if (unsatisfiedConditions.Count == 0)
                 {
                     // We found a plan!
+                    return new ActionPlan();
+                }
+                
+                foreach (GoapAction action in actions)
+                {
+                    HashSet<GoapCondition> newConditions = GoapResolver.ApplyEffects(action, unsatisfiedConditions);
+                    
+                    if(newConditions.SetEquals(unsatisfiedConditions)
+                       || !GoapResolver.EffectsResolveConditions(unsatisfiedConditions, newConditions)
+                       )
+                        continue;
+                    
+                    newConditions = GoapResolver.CombineConditionSets(newConditions, action.Conditions);
+                    
+                    // Might need a better heuristic for float/int conditions. 
+                    int heuristic = newConditions.Count;
+                    int newCost = action.CalculateCost(plannerState) + current.Edge.Cost + heuristic;
+                    
+                    PlannerEdge edge = new PlannerEdge(current, newCost, action);
+                    PlannerNode newNode = new PlannerNode(newConditions, edge);
+                    priorityQueue.Enqueue(newNode, newCost);
                 }
             }
             

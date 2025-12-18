@@ -4,15 +4,25 @@ using GOAP.Util;
 
 namespace GOAP.Core
 {
-    public class GoapEffect
+    public struct GoapEffect : IEquatable<GoapEffect>
     {
-        public GoapDataType GoapDataType { get; private set; }
-        public string Key { get; private set; }
-        public object Value { get; private set; }
-        public EffectState EffectDirection { get; private set; }
+        public GoapDataType GoapDataType;
+        public string Key;
+        public object Value;
+        public EffectDirection EffectDirection;
+
+        public bool Equals(GoapEffect other)
+        {
+            return GoapDataType == other.GoapDataType && Key == other.Key && Equals(Value, other.Value) && EffectDirection == other.EffectDirection;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine((int)GoapDataType, Key, Value, (int)EffectDirection);
+        }
     }
 
-    public enum EffectState
+    public enum EffectDirection
     {
         Set,
         Increase,
