@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using GOAP.Core.Planning;
-using MyBox;
+using GOAP.Runtime.Internal;
 using UnityEngine;
 
-namespace GOAP.Core.Agent
+namespace GOAP.Runtime.Agent
 {
-    public class WorldState
+    public class WorldState : IWorldState
     {
         private readonly Dictionary<string, Func<object>> data;
         

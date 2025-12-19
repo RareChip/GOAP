@@ -1,8 +1,7 @@
 using System;
-using GOAP.Core.Planning;
-using GOAP.Util;
+using GOAP.Runtime.Util;
 
-namespace GOAP.Core
+namespace GOAP.Runtime
 {
     public struct GoapEffect : IEquatable<GoapEffect>
     {

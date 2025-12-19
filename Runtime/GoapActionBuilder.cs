@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using GOAP.Core.Planning;
-using GOAP.Util;
+using GOAP.Runtime.Internal;
+using GOAP.Runtime.Util;
 
-namespace GOAP.Core
+namespace GOAP.Runtime
 {
     public interface IGoapActionBuilder
     {
@@ -17,11 +17,15 @@ namespace GOAP.Core
 
     public interface IGoapActionCostBuilder
     {
-        IFinalGoapActionBuilder WithCost(Func<PlannerState,int> costFunc);
+        IFinalGoapActionBuilder WithCost(Func<IWorldState,int> costFunc);
     }
     public interface IFinalGoapActionBuilder
     {
+        IFinalGoapActionBuilder WithCondition(string key, bool value);
+        IFinalGoapActionBuilder WithCondition(string key, ConditionDirection direction, object value);
         IFinalGoapActionBuilder WithCondition(GoapCondition condition);
+        IFinalGoapActionBuilder WithEffect(string key, bool value);
+        IFinalGoapActionBuilder WithEffect(string key, EffectDirection direction, object value);
         IFinalGoapActionBuilder WithEffect(GoapEffect effect);
         GoapAction Build();
     }
@@ -33,7 +37,7 @@ namespace GOAP.Core
         private HashSet<GoapCondition> conditions;
         private HashSet<GoapEffect> effects;
         private IActionStrategy actionStrategy;
-        private Func<PlannerState, int> costFunc;
+        private Func<IWorldState, int> costFunc;
         
         public GoapActionBuilder()
         {
@@ -54,11 +58,36 @@ namespace GOAP.Core
             return this;
         }
 
-        public IFinalGoapActionBuilder WithCost(Func<PlannerState, int> costFunction)
+        public IFinalGoapActionBuilder WithCost(Func<IWorldState, int> costFunction)
         {
             costFunc = costFunction;
             return this;
         }
+
+
+        public IFinalGoapActionBuilder WithCondition(string key, bool value)
+        {
+            return WithCondition(new GoapCondition
+            {
+                Key = key,
+                ConditionDirection = ConditionDirection.Equals,
+                Value = value,
+                GoapDataType = GoapDataType.Bool
+            });
+        }
+
+        public IFinalGoapActionBuilder WithCondition(string key, ConditionDirection direction, object value)
+        {
+            return WithCondition(new GoapCondition
+            {
+                Key = key,
+                ConditionDirection = direction,
+                Value = value,
+                GoapDataType = GoapUtils.GetGoapDataType(value)
+            });
+        }
+        
+
         public IFinalGoapActionBuilder WithCondition(GoapCondition condition)
         {
             if (!GoapUtils.VerifyCondition(condition))
@@ -66,6 +95,29 @@ namespace GOAP.Core
             
             conditions.Add(condition);
             return this;
+        }
+
+        public IFinalGoapActionBuilder WithEffect(string key, bool value)
+        {
+            effects.Add(new GoapEffect
+            {
+                Key = key,
+                Value = value,
+                GoapDataType = GoapDataType.Bool,
+                EffectDirection = EffectDirection.Set
+            });
+            return this;
+        }
+
+        public IFinalGoapActionBuilder WithEffect(string key, EffectDirection direction, object value)
+        {
+            return WithEffect(new GoapEffect
+            {
+                Key = key,
+                Value = value,
+                GoapDataType = GoapUtils.GetGoapDataType(value),
+                EffectDirection = direction
+            });
         }
 
         public IFinalGoapActionBuilder WithEffect(GoapEffect effect)

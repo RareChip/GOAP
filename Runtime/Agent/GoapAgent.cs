@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using GOAP.Core.Planning;
+using GOAP.Runtime.Internal;
 using UnityEngine;
 
-namespace GOAP.Core.Agent
+namespace GOAP.Runtime.Agent
 {
     public class GoapAgent : MonoBehaviour
     {
@@ -11,7 +11,7 @@ namespace GOAP.Core.Agent
         private HashSet<GoapGoal> goals;
         private WorldState worldState;
         
-        private GoapPlanner planner;
+        private IGoapPlanner planner;
         private GoapGoal currentGoal;
         private ActionPlan currentPlan;
         private void Awake()

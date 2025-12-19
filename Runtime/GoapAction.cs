@@ -1,20 +1,18 @@
 using System;
 using System.Collections.Generic;
-using GOAP.Core.Agent;
-using GOAP.Core.Planning;
 
-namespace GOAP.Core
+namespace GOAP.Runtime
 {
     public sealed class GoapAction
     {
         public string ActionName { get; private set; }
-        public Func<PlannerState, int> CalculateCost { get; private set; }
+        public Func<IWorldState, int> CalculateCost { get; private set; }
         public HashSet<GoapCondition> Conditions { get; private set; }
         public HashSet<GoapEffect> Effects { get; private set; }
         
         private readonly IActionStrategy actionStrategy;
 
-        public GoapAction(string actionName, IActionStrategy actionStrategy, Func<PlannerState, int> costFunc, 
+        public GoapAction(string actionName, IActionStrategy actionStrategy, Func<IWorldState, int> costFunc, 
             HashSet<GoapCondition> conditions, HashSet<GoapEffect> effects)
         {
             ActionName = actionName;

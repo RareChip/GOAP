@@ -1,22 +1,30 @@
 using System;
-using GOAP.Core;
-using UnityEngine;
 
-namespace GOAP.Util
+namespace GOAP.Runtime.Util
 {
     public static class GoapUtils
     {
-        public static GoapCondition CreateEnumCondition(string key, ConditionDirection direction, int enumValue)
+        public static GoapDataType GetGoapDataType(object value)
         {
-            return new GoapCondition
-            {
-                Key = key,
-                Value = enumValue,
-                ConditionDirection = direction,
-                GoapDataType = GoapDataType.Enum
-            };
-        }
+            GoapDataType dataType;
 
+            switch (value)
+            {
+                case int:
+                    dataType = GoapDataType.Int;
+                    break;
+                case float:
+                    dataType = GoapDataType.Float;
+                    break;
+                case bool:
+                    dataType = GoapDataType.Bool;
+                    break;
+                default:
+                    throw new Exception("Incompatible type!");
+            }
+
+            return dataType;
+        }
         public static bool VerifyCondition(GoapCondition condition)
         {
             switch (condition.GoapDataType)
@@ -25,10 +33,11 @@ namespace GOAP.Util
                     return condition.ConditionDirection is ConditionDirection.Equals
                         or ConditionDirection.NotEquals;
                 case GoapDataType.Int:
-                    return true;
+                    return condition.ConditionDirection is ConditionDirection.GreaterThanEq
+                        or ConditionDirection.LessThanEq;
                 case GoapDataType.Float:
-                    return condition.ConditionDirection is ConditionDirection.GreaterThan
-                        or ConditionDirection.LessThan;
+                    return condition.ConditionDirection is ConditionDirection.GreaterThanEq
+                        or ConditionDirection.LessThanEq;
                 case GoapDataType.Enum:
                     return condition.ConditionDirection is ConditionDirection.Equals
                         or ConditionDirection.NotEquals;
@@ -42,16 +51,16 @@ namespace GOAP.Util
             switch (effect.GoapDataType)
             {
                 case GoapDataType.Bool:
-                    return effect.EffectDirection is EffectDirection.Set;
-                case GoapDataType.Int:
-                    return true;
-                case GoapDataType.Float:
-                    return effect.EffectDirection is not EffectDirection.Set;
                 case GoapDataType.Enum:
                     return effect.EffectDirection is EffectDirection.Set;
+                case GoapDataType.Int:
+                case GoapDataType.Float:
+                    return effect.EffectDirection is not EffectDirection.Set;
             }
 
             return false;
         }
+
+        
     }
 }

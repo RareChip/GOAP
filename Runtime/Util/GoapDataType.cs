@@ -1,4 +1,4 @@
-namespace GOAP.Util
+namespace GOAP.Runtime.Util
 {
     public enum GoapDataType
     {

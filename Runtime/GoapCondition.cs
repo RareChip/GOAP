@@ -1,9 +1,7 @@
 using System;
-using GOAP.Core.Planning;
-using GOAP.Util;
-using UnityEngine;
+using GOAP.Runtime.Util;
 
-namespace GOAP.Core
+namespace GOAP.Runtime
 {
     public struct GoapCondition : IEquatable<GoapCondition>
     {
@@ -35,7 +33,7 @@ namespace GOAP.Core
     {
         Equals,
         NotEquals,
-        LessThan,
-        GreaterThan,
+        LessThanEq,
+        GreaterThanEq,
     }
 }

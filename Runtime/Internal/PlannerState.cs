@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GOAP.Core.Planning
+namespace GOAP.Runtime.Internal
 {
-    public class PlannerState
+    public class PlannerState : IWorldState
     {
         private readonly Dictionary<string, object> data;
 
@@ -18,8 +18,8 @@ namespace GOAP.Core.Planning
             if (!data.TryGetValue(key, out var value))
                 return default;
 
-            if (value is Func<T> fun) 
-                return fun();
+            if (value is T v) 
+                return v;
 
             Debug.LogError("Value of Key [" + key + "] is not of type [" + typeof(T) + "].");
             return default;
