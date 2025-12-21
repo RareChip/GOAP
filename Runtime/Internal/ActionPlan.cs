@@ -5,10 +5,10 @@ namespace GOAP.Runtime.Internal
     public class ActionPlan
     {
         public GoapGoal Goal { get; }
-        public Stack<GoapAction> Actions { get; }
+        public Queue<GoapAction> Actions { get; }
         public int TotalCost { get; }
 
-        public ActionPlan(GoapGoal goal, Stack<GoapAction> actions, int totalCost)
+        public ActionPlan(GoapGoal goal, Queue<GoapAction> actions, int totalCost)
         {
             Goal = goal;
             Actions = actions;

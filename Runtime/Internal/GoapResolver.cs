@@ -91,7 +91,7 @@ namespace GOAP.Runtime.Internal
                     throw new ArgumentOutOfRangeException();
             }
         }
-
+        
         public static bool EffectsSatisfyConditions(HashSet<GoapEffect> effects, HashSet<GoapCondition> conditions)
         {
             Dictionary<string, GoapCondition> conditionMap = new Dictionary<string, GoapCondition>();
@@ -110,13 +110,20 @@ namespace GOAP.Runtime.Internal
                 switch (condition.ConditionDirection)
                 {
                     case ConditionDirection.Equals:
-                        if(effect.EffectDirection == EffectDirection.Set && effect.Value.Equals(condition.Value))
+                        if (effect.EffectDirection == EffectDirection.Set && effect.Value.Equals(condition.Value))
+                        {
                             satisfiesSomething = true;
-                        break;
+                            break;
+                        }
+                        return false;
                     case ConditionDirection.NotEquals:
                         if (effect.EffectDirection == EffectDirection.Set && !effect.Value.Equals(condition.Value))
+                        {
                             satisfiesSomething = true;
-                        break;
+                            break;
+                        }
+
+                        return false;
                     case ConditionDirection.LessThanEq:
                         switch (effect.EffectDirection)
                         {
@@ -183,8 +190,6 @@ namespace GOAP.Runtime.Internal
                     switch (effect.GoapDataType)
                     {
                         case GoapDataType.Bool:
-                            condition.Value = !(bool)condition.Value;
-                            return condition;
                         case GoapDataType.Enum:
                             return !effect.Value.Equals(condition.Value) ? condition : default;
                         default:
@@ -196,10 +201,12 @@ namespace GOAP.Runtime.Internal
                         case GoapDataType.Int:
                             int newVal = (int)condition.Value - (int)effect.Value;
                             condition.Value = newVal;
+                            
                             return condition;
                         case GoapDataType.Float:
                             float newFloat = (float)condition.Value - (float)effect.Value;
                             condition.Value = newFloat;
+                            
                             return condition;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -246,12 +253,18 @@ namespace GOAP.Runtime.Internal
                     switch (goapCondition.ConditionDirection)
                     {
                         case ConditionDirection.Equals:
-                            if (other.ConditionDirection == ConditionDirection.NotEquals)
+                            if ((other.ConditionDirection == ConditionDirection.NotEquals
+                                && (bool)other.Value == (bool)goapCondition.Value)
+                                || (other.ConditionDirection == ConditionDirection.Equals
+                                && (bool)other.Value != (bool)goapCondition.Value))
                                 return null;
                             combinedSet.Add(goapCondition);
                             break;
                         case ConditionDirection.NotEquals:
-                            if (other.ConditionDirection == ConditionDirection.Equals)
+                            if ((other.ConditionDirection == ConditionDirection.NotEquals
+                                 && (bool)other.Value != (bool)goapCondition.Value)
+                                || (other.ConditionDirection == ConditionDirection.Equals
+                                    && (bool)other.Value == (bool)goapCondition.Value))
                                 return null;
                             combinedSet.Add(goapCondition);
                             break;
@@ -309,6 +322,16 @@ namespace GOAP.Runtime.Internal
             }
             
             return combinedSet;
+        }
+
+        public static bool IsSubset(PlannerNode node, HashSet<PlannerNode> existingNodes)
+        {
+            foreach (PlannerNode existingNode in existingNodes)
+            {
+                
+            }
+
+            return false;
         }
 
         private static Exception TypeException()

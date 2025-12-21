@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using GOAP.Runtime.Util;
+using UnityEngine;
 
 namespace GOAP.Runtime.Internal
 {
@@ -34,19 +36,28 @@ namespace GOAP.Runtime.Internal
             {
                 PlannerNode current = priorityQueue.Dequeue();
 
-                if (!visitedNodes.Add(current))
+                
+                if (visitedNodes.Contains(current) || 
+                    (visitedNodes.Any(x => x.IsJustAsGood(current, worldState) && x.Cost <= current.Cost)))
                 {
                     continue;
                 }
                 
-                if (current.Conditions.Count == 0)
+                visitedNodes.Add(current);
+                
+                // if(!visitedNodes.Add(current)) 
+                //     continue;
+                
+                bool allConditionsSatisfied =
+                    current.Conditions.All(x => GoapResolver.ConditionIsSatisfied(x, worldState));
+                if (allConditionsSatisfied)
                 {
                     // We found a plan!
-                    Stack<GoapAction> path = new Stack<GoapAction>();
+                    Queue<GoapAction> path = new Queue<GoapAction>();
                     int totalCost = current.Cost;
                     while (current.ParentNode != null)
                     {
-                        path.Push(current.Action);
+                        path.Enqueue(current.Action);
                         current = current.ParentNode;
                     }
                     
@@ -68,19 +79,24 @@ namespace GOAP.Runtime.Internal
                         continue;
                     }
 
-                    newConditions.RemoveWhere(x => GoapResolver.ConditionIsSatisfied(x, worldState));
+                    // newConditions.RemoveWhere(x => 
+                    //     x.GoapDataType is GoapDataType.Float or GoapDataType.Int &&
+                    //                                GoapResolver.ConditionIsSatisfied(x, worldState));
+
+                    int heuristic = newConditions.Count(
+                        x => !GoapResolver.ConditionIsSatisfied(x, worldState)
+                    );
+                    int nodeCost = action.CalculateCost(worldState) + current.Cost;
+                    int priority = nodeCost + heuristic;
                     
-                    int heuristic = newConditions.Count;
-                    int newCost = action.CalculateCost(worldState) + current.Cost + heuristic;
-                    
-                    PlannerNode newNode = new PlannerNode(newConditions, current, newCost, action);
-                    priorityQueue.Enqueue(newNode, newCost);
+                    PlannerNode newNode = new PlannerNode(newConditions, current, nodeCost, action);
+                    priorityQueue.Enqueue(newNode, priority);
                 }
             }
             
             return null;
         }
         
-        
+        // private Dictionary<IWorldState, int>
     }
 }

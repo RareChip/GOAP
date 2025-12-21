@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using GOAP.Runtime.Internal;
 
 namespace GOAP.Runtime.Util
 {
@@ -61,6 +63,46 @@ namespace GOAP.Runtime.Util
             return false;
         }
 
-        
+        public static void ApplyEffectsToPlannerState(HashSet<GoapEffect> effects, PlannerState plannerState)
+        {
+            foreach (GoapEffect effect in effects)
+            {
+                switch (effect.EffectDirection)
+                {
+                    case EffectDirection.Set:
+                        plannerState.Update(effect.Key, effect.Value);
+                        break;
+                    case EffectDirection.Increase:
+                        switch (effect.GoapDataType)
+                        {
+                            case GoapDataType.Int:
+                                plannerState.Update(effect.Key, plannerState.Get<int>(effect.Key) + (int)effect.Value);
+                                break;
+                            case GoapDataType.Float:
+                                plannerState.Update(effect.Key, plannerState.Get<float>(effect.Key) + (float)effect.Value);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                        
+                        break;
+                    case EffectDirection.Decrease:
+                        switch (effect.GoapDataType)
+                        {
+                            case GoapDataType.Int:
+                                plannerState.Update(effect.Key, plannerState.Get<int>(effect.Key) - (int)effect.Value);
+                                break;
+                            case GoapDataType.Float:
+                                plannerState.Update(effect.Key, plannerState.Get<float>(effect.Key) - (float)effect.Value);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
     }
 }

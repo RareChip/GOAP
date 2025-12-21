@@ -41,6 +41,17 @@ namespace GOAP.Runtime
                 });
             }
             
+            public Builder WithCondition(string key, bool value)
+            {
+                return WithCondition(new GoapCondition
+                {
+                    Key = key,
+                    ConditionDirection = ConditionDirection.Equals,
+                    Value = value,
+                    GoapDataType = GoapDataType.Bool
+                });
+            }
+            
             public Builder WithCondition(GoapCondition condition)
             {
                 if (!GoapUtils.VerifyCondition(condition))
