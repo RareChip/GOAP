@@ -45,8 +45,6 @@ namespace GOAP.Runtime.Internal
                 
                 visitedNodes.Add(current);
                 
-                // if(!visitedNodes.Add(current)) 
-                //     continue;
                 
                 bool allConditionsSatisfied =
                     current.Conditions.All(x => GoapResolver.ConditionIsSatisfied(x, worldState));
@@ -78,10 +76,6 @@ namespace GOAP.Runtime.Internal
                     {
                         continue;
                     }
-
-                    // newConditions.RemoveWhere(x => 
-                    //     x.GoapDataType is GoapDataType.Float or GoapDataType.Int &&
-                    //                                GoapResolver.ConditionIsSatisfied(x, worldState));
 
                     int heuristic = newConditions.Count(
                         x => !GoapResolver.ConditionIsSatisfied(x, worldState)

@@ -46,7 +46,7 @@ namespace GOAP.Testing.UnitTests
 
             actions.Add(builder.CreateAction("BuildWall")
                 .WithStrategy(new NoOpStrategy())
-                .WithCost(x => 1)
+                .WithCost(_ => 1)
                 .WithEffect(new GoapEffect
                 {
                     Key = "WallsBuilt",
@@ -86,13 +86,13 @@ namespace GOAP.Testing.UnitTests
         
             actions.Add(builder.CreateAction("BuildWall")
                 .WithStrategy(new NoOpStrategy())
-                .WithCost(x => 1)
+                .WithCost(_ => 1)
                 .WithEffect("WallsBuilt",EffectDirection.Increase,1)
                 .Build());
             
             actions.Add(builder.CreateAction("Prepare")
                 .WithStrategy(new NoOpStrategy())
-                .WithCost(x => 1)
+                .WithCost(_ => 1)
                 .WithEffect("Prepared",true)
                 .Build());
 
@@ -125,7 +125,7 @@ namespace GOAP.Testing.UnitTests
 
             actions.Add(builder.CreateAction("BuildWall")
                 .WithStrategy(new NoOpStrategy())
-                .WithCost(x => 1)
+                .WithCost(_ => 1)
                 .WithCondition("WoodCount", ConditionDirection.GreaterThanEq, 5)
                 .WithCondition("HandsFree", ConditionDirection.Equals, true)
                 .WithEffect("WallsBuilt", EffectDirection.Increase, 1)
@@ -134,7 +134,7 @@ namespace GOAP.Testing.UnitTests
 
             actions.Add(builder.CreateAction("GatherWood")
                 .WithStrategy(new NoOpStrategy())
-                .WithCost(x => 1)
+                .WithCost(_ => 1)
                 .WithCondition("WoodInWorld", ConditionDirection.GreaterThanEq, 5)
                 .WithEffect("WoodCount", EffectDirection.Increase, 5)
                 .WithEffect("WoodInWorld", EffectDirection.Decrease, 5)
@@ -142,14 +142,14 @@ namespace GOAP.Testing.UnitTests
 
             actions.Add(builder.CreateAction("ChopTree")
                 .WithStrategy(new NoOpStrategy())
-                .WithCost(x => 1)
+                .WithCost(_ => 1)
                 .WithCondition("HasAxe", true)
                 .WithEffect("WoodInWorld", EffectDirection.Increase, 5)
                 .Build());
 
             actions.Add(builder.CreateAction("PickupAxe")
                 .WithStrategy(new NoOpStrategy())
-                .WithCost(x => 2)
+                .WithCost(_ => 2)
                 .WithCondition("HandsFree", true)
                 .WithEffect("HasAxe", true)
                 .WithEffect("HandsFree", false)
@@ -157,7 +157,7 @@ namespace GOAP.Testing.UnitTests
 
             actions.Add(builder.CreateAction("DropItem")
                 .WithStrategy(new NoOpStrategy())
-                .WithCost(x => 1)
+                .WithCost(_ => 1)
                 .WithCondition("HandsFree", false)
                 .WithEffect("HandsFree", true)
                 .WithEffect("HasAxe", false)
@@ -165,11 +165,11 @@ namespace GOAP.Testing.UnitTests
 
             ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
+            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
             Assert.AreEqual(14, plan.Actions.Count);
             Assert.AreEqual(15, plan.TotalCost);
             Assert.AreEqual("BuildWallsGoal", plan.Goal.GoalName);
 
-            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
         }
 
         [Test]
@@ -197,7 +197,7 @@ namespace GOAP.Testing.UnitTests
             HashSet<GoapAction> actions = TestUtils.AddAllActions(
                 builder.CreateAction("CraftPickaxe")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 5)
+                    .WithCost(_ => 5)
                     .WithCondition("StickCount", ConditionDirection.GreaterThanEq, 2)
                     .WithCondition("IngotCount", ConditionDirection.GreaterThanEq, 3)
                     .WithCondition("AtCraftingTable", true)
@@ -205,7 +205,7 @@ namespace GOAP.Testing.UnitTests
                     .Build(),
                 builder.CreateAction("SmeltOre")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 2)
+                    .WithCost(_ => 2)
                     .WithCondition("AtFurnace", true)
                     .WithCondition("OreCount", ConditionDirection.GreaterThanEq, 1)
                     .WithEffect("IngotCount", EffectDirection.Increase, 1)
@@ -213,7 +213,7 @@ namespace GOAP.Testing.UnitTests
                     .Build(),
                 builder.CreateAction("ChopWood")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 3)
+                    .WithCost(_ => 3)
                     .WithCondition("AtTree", true)
                     .WithCondition("HasAxe", true)
                     .WithEffect("WoodCount", EffectDirection.Increase, 3)
@@ -221,12 +221,12 @@ namespace GOAP.Testing.UnitTests
                     .Build(),
                 builder.CreateAction("EquipAxe")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 1)
+                    .WithCost(_ => 1)
                     .WithEffect("HasAxe", true)
                     .Build(),
                 builder.CreateAction("GoToTree")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 1)
+                    .WithCost(_ => 1)
                     .WithEffect("AtTree", true)
                     .WithEffect("AtFurnace", false)
                     .WithEffect("AtMine", false)
@@ -234,7 +234,7 @@ namespace GOAP.Testing.UnitTests
                     .Build(),
                 builder.CreateAction("GoToFurnace")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 1)
+                    .WithCost(_ => 1)
                     .WithEffect("AtTree", false)
                     .WithEffect("AtFurnace", true)
                     .WithEffect("AtMine", false)
@@ -242,7 +242,7 @@ namespace GOAP.Testing.UnitTests
                     .Build(),
                 builder.CreateAction("GoToCraftingTable")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 1)
+                    .WithCost(_ => 1)
                     .WithEffect("AtTree", false)
                     .WithEffect("AtFurnace", false)
                     .WithEffect("AtMine", false)
@@ -250,7 +250,7 @@ namespace GOAP.Testing.UnitTests
                     .Build(),
                 builder.CreateAction("GoToMine")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 1)
+                    .WithCost(_ => 1)
                     .WithEffect("AtTree", false)
                     .WithEffect("AtFurnace", false)
                     .WithEffect("AtCraftingTable",false)
@@ -258,14 +258,14 @@ namespace GOAP.Testing.UnitTests
                     .Build(),
                 builder.CreateAction("CraftSticks")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 1)
+                    .WithCost(_ => 1)
                     .WithCondition("AtCraftingTable",true)
                     .WithCondition("WoodCount", ConditionDirection.GreaterThanEq, 2)
                     .WithEffect("StickCount", EffectDirection.Increase, 4)
                     .Build(),
                 builder.CreateAction("MineOre")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 5)
+                    .WithCost(_ => 5)
                     .WithCondition("AtMine", true)
                     .WithEffect("OreCount", EffectDirection.Increase, 1)
                     .Build()
@@ -274,8 +274,8 @@ namespace GOAP.Testing.UnitTests
             ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
-            Assert.AreEqual(12, plan.Actions.Count);
-            Assert.AreEqual(25, plan.TotalCost);
+            Assert.AreEqual(14, plan.Actions.Count);
+            Assert.AreEqual(35, plan.TotalCost);
             Assert.AreEqual("CraftPickaxeGoal", plan.Goal.GoalName);
 
         }
@@ -295,22 +295,22 @@ namespace GOAP.Testing.UnitTests
             HashSet<GoapAction> actions = TestUtils.AddAllActions(
                 builder.CreateAction("TinyHeal")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 1)
+                    .WithCost(_ => 1)
                     .WithEffect("Health", EffectDirection.Increase, 1)
                     .Build(),
                 builder.CreateAction("BigHeal")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 30)
+                    .WithCost(_ => 30)
                     .WithEffect("Health", EffectDirection.Increase, 33)
                     .Build());
             
             ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
+            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
             Assert.AreEqual(91, plan.TotalCost);
             Assert.AreEqual(4, plan.Actions.Count);
             Assert.AreEqual("HealGoal", plan.Goal.GoalName);
 
-            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
             Assert.AreEqual(100,worldState.Get<int>("Health"));
         }
 
@@ -332,22 +332,227 @@ namespace GOAP.Testing.UnitTests
             HashSet<GoapAction> actions = TestUtils.AddAllActions(
                 builder.CreateAction("BuyBed")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 1)
+                    .WithCost(_ => 1)
                     .WithCondition("Money", ConditionDirection.GreaterThanEq, 20)
                     .WithEffect("HasBed", true)
                     .WithEffect("Money", EffectDirection.Decrease, 20)
                     .Build(),
                 builder.CreateAction("SellCrops")
                     .WithStrategy(new NoOpStrategy())
-                    .WithCost(x => 1)
+                    .WithCost(_ => 1)
                     .WithEffect("Money", EffectDirection.Increase, 5)
                     .Build());
             
             ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
+            Assert.AreEqual(4, plan.Actions.Count);
+            Assert.AreEqual(4, plan.TotalCost);
         }
 
-        // Test case for actions where multiple conditions should merge (e.g Health > 30 + Health > 50 = Health > 50)
+        [Test]
+        public void TestPlanMergingConditions()
+        {
+            IGoapPlanner planner = new GoapPlanner();
+            IGoapActionBuilder builder = new GoapActionBuilder();
+            Dictionary<string, object> worldData = new Dictionary<string, object>();
+            worldData.Add("Health", 10f);
+            worldData.Add("BossHealth", 50);
+            
+            PlannerState worldState = new PlannerState(worldData);
+            GoapGoal goal = new GoapGoal.Builder("KillBoss")
+                .WithCondition("BossHealth", ConditionDirection.LessThanEq, 0)
+                .WithCondition("Health", ConditionDirection.GreaterThanEq, 15f)
+                .Build();
+            
+            HashSet<GoapAction> actions = TestUtils.AddAllActions(
+                builder.CreateAction("TinyHeal")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 5)
+                    .WithEffect("Health", EffectDirection.Increase, 5f)
+                    .Build(),
+                builder.CreateAction("BigHeal")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 15)
+                    .WithEffect("Health", EffectDirection.Increase, 40f)
+                    .Build(),
+                builder.CreateAction("UltraAttack")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 6)
+                    .WithCondition("Health", ConditionDirection.GreaterThanEq, 50f)
+                    .WithEffect("BossHealth", EffectDirection.Decrease, 22)
+                    .Build(),
+                builder.CreateAction("MehAttack")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 4)
+                    .WithEffect("BossHealth", EffectDirection.Decrease, 6)
+                    .Build()
+                );
+            
+            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            Assert.NotNull(plan);
+            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
+            Assert.AreEqual(4, plan.Actions.Count);
+            Assert.AreEqual(31, plan.TotalCost);
+        }
+
+        [Test]
+        public void TestPlanImpossible()
+        {
+            IGoapPlanner planner = new GoapPlanner();
+            IGoapActionBuilder builder = new GoapActionBuilder();
+            Dictionary<string, object> worldData = new Dictionary<string, object>();
+            worldData.Add("BeastHealth", 10);
+            worldData.Add("IsWorthy", false);
+            
+            PlannerState worldState = new PlannerState(worldData);
+            GoapGoal goal = new GoapGoal.Builder("KillTheBeast")
+                .WithCondition("BeastHealth", ConditionDirection.LessThanEq, 0)
+                .Build();
+
+            HashSet<GoapAction> actions = TestUtils.AddAllActions(
+                builder.CreateAction("SlayBeast")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 20)
+                    .WithCondition("IsWorthy", true)
+                    .WithEffect("BeastHealth", EffectDirection.Decrease, 100)
+                    .Build()
+            );
+            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            Assert.Null(plan);
+        }
+        
+        [Test]
+        public void TestInfinitePlanImpossible()
+        {
+            IGoapPlanner planner = new GoapPlanner();
+            IGoapActionBuilder builder = new GoapActionBuilder();
+            Dictionary<string, object> worldData = new Dictionary<string, object>();
+            worldData.Add("Money", 10);
+            worldData.Add("HasTicket", false);
+            
+            PlannerState worldState = new PlannerState(worldData);
+            GoapGoal goal = new GoapGoal.Builder("WinBig")
+                .WithCondition("Money", ConditionDirection.GreaterThanEq, 100)
+                .Build();
+
+            HashSet<GoapAction> actions = TestUtils.AddAllActions(
+                builder.CreateAction("Gamble")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 1)
+                    .WithCondition("HasTicket", true)
+                    .WithEffect("Money", EffectDirection.Increase, 10)
+                    .WithEffect("HasTicket", false)
+                    .Build(),
+                builder.CreateAction("BuyTicket")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 1)
+                    .WithCondition("Money", ConditionDirection.GreaterThanEq, 10)
+                    .WithEffect("Money", EffectDirection.Decrease, 10)
+                    .WithEffect("HasTicket", true)
+                    .Build()
+            );
+            
+            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            Assert.Null(plan);
+        }
+
+        [Test]
+        public void TestPlanNegativeCondition()
+        {
+            IGoapPlanner planner = new GoapPlanner();
+            IGoapActionBuilder builder = new GoapActionBuilder();
+            Dictionary<string, object> worldData = new Dictionary<string, object>();
+            worldData.Add("Temp", -20);
+            worldData.Add("IceCreamForSale", false);
+            worldData.Add("SnowmanCount", 3);
+            
+            PlannerState worldState = new PlannerState(worldData);
+            GoapGoal goal = new GoapGoal.Builder("SummerTime")
+                .WithCondition("Temp", ConditionDirection.GreaterThanEq, 80)
+                .WithCondition("IceCreamForSale", true)
+                .WithCondition("SnowmanCount", ConditionDirection.LessThanEq, 0)
+                .Build();
+
+            HashSet<GoapAction> actions = TestUtils.AddAllActions(
+                builder.CreateAction("ShineSun")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 10)
+                    .WithEffect("Temp", EffectDirection.Increase, 25)
+                    .Build(),
+                builder.CreateAction("MeltSnowman")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 1)
+                    .WithCondition("Temp", ConditionDirection.GreaterThanEq, 40)
+                    .WithEffect("SnowmanCount", EffectDirection.Decrease, 1)
+                    .Build(),
+                builder.CreateAction("OpenIceCreamShop")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 5)
+                    .WithCondition("Temp", ConditionDirection.GreaterThanEq, 70)
+                    .WithCondition("SnowmanCount", ConditionDirection.LessThanEq, 0)
+                    .WithEffect("IceCreamForSale", true)
+                    .Build()
+            );
+            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
+            Assert.AreEqual(48,plan.TotalCost);
+            Assert.AreEqual(8,plan.Actions.Count);
+        }
+
+        [Test]
+        public void TestFindsBestPathWithContradictions()
+        {
+            IGoapPlanner planner = new GoapPlanner();
+            IGoapActionBuilder builder = new GoapActionBuilder();
+            Dictionary<string, object> worldData = new Dictionary<string, object>();
+            worldData.Add("AtBossLocation", true);
+            worldData.Add("BandAids", 100);
+            worldData.Add("MedKits", 0);
+            worldData.Add("PickedUpMedkits", false);
+            worldData.Add("Health", 10);
+            
+            PlannerState worldState = new PlannerState(worldData);
+            GoapGoal goal = new GoapGoal.Builder("BeginBossFight")
+                .WithCondition("AtBossLocation", true)
+                .WithCondition("Health", ConditionDirection.GreaterThanEq, 100)
+                .Build();
+
+            HashSet<GoapAction> actions = TestUtils.AddAllActions(
+                builder.CreateAction("UseBandAid")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 3)
+                    .WithCondition("BandAids", ConditionDirection.GreaterThanEq, 1)
+                    .WithEffect("BandAids", EffectDirection.Decrease, 1)
+                    .WithEffect("Health", EffectDirection.Increase, 3)
+                    .Build(),
+                builder.CreateAction("UseMedKit")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 10)
+                    .WithCondition("MedKits", ConditionDirection.GreaterThanEq, 1)
+                    .WithEffect("MedKits", EffectDirection.Decrease, 1)
+                    .WithEffect("Health", EffectDirection.Increase, 45)
+                    .Build(),
+                builder.CreateAction("GoToBossLocation")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 1)
+                    .WithEffect("AtBossLocation", true)
+                    .Build(),
+                builder.CreateAction("WalkThroughSpikesForMedkits")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 20)
+                    .WithCondition("PickedUpMedkits", false)
+                    .WithEffect("Health", EffectDirection.Decrease, 5)
+                    .WithEffect("AtBossLocation", false)
+                    .WithEffect("MedKits", EffectDirection.Increase, 5)
+                    .WithEffect("PickedUpMedkits", true)
+                    .Build()
+            );
+            
+            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
+            Assert.AreEqual(47,plan.TotalCost);
+            Assert.AreEqual(6,plan.Actions.Count);
+        }
     }
 }

@@ -129,7 +129,7 @@ namespace GOAP.Runtime.Internal
                         {
                             case EffectDirection.Increase:
                                 // Contradiction
-                                return false;
+                                break;
                             case EffectDirection.Decrease:
                                 satisfiesSomething = true;
                                 break;
@@ -145,7 +145,7 @@ namespace GOAP.Runtime.Internal
                                 break;
                             case EffectDirection.Decrease:
                                 // Contradiction
-                                return false;
+                                break;
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }

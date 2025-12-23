@@ -21,9 +21,10 @@ namespace GOAP.Testing
         }
         public static void AssertPlanMakesSense(ActionPlan plan, PlannerState worldState, GoapGoal goal)
         {
-            while (plan.Actions.Count > 0)
+            Queue<GoapAction> planCopy = new Queue<GoapAction>(plan.Actions);
+            while (planCopy.Count > 0)
             {
-                GoapAction current = plan.Actions.Dequeue();
+                GoapAction current = planCopy.Dequeue();
                 foreach (GoapCondition currentCondition in current.Conditions)
                 {
                     Assert.IsTrue(GoapResolver.ConditionIsSatisfied(currentCondition, worldState));
