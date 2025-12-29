@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GOAP.Runtime.Util;
@@ -11,7 +12,7 @@ namespace GOAP.Runtime.Internal
         // implementation will use Utility AI
         public GoapGoal GenerateBestGoal(HashSet<GoapGoal> goals)
         {
-            
+
             return null;
         }
 
@@ -21,12 +22,12 @@ namespace GOAP.Runtime.Internal
             {
                 return null;
             }
-            
+
             PriorityQueue<PlannerNode, int> priorityQueue = new PriorityQueue<PlannerNode, int>();
             HashSet<PlannerNode> visitedNodes = new HashSet<PlannerNode>();
-            
+
             PlannerNode startingNode = new PlannerNode(
-                new HashSet<GoapCondition>(goal.Conditions), 
+                new HashSet<GoapCondition>(goal.Conditions),
                 null,
                 0,
                 null);
@@ -36,16 +37,16 @@ namespace GOAP.Runtime.Internal
             {
                 PlannerNode current = priorityQueue.Dequeue();
 
-                
-                if (visitedNodes.Contains(current) || 
+
+                if (visitedNodes.Contains(current) ||
                     (visitedNodes.Any(x => x.IsJustAsGood(current, worldState) && x.Cost <= current.Cost)))
                 {
                     continue;
                 }
-                
+
                 visitedNodes.Add(current);
-                
-                
+
+
                 bool allConditionsSatisfied =
                     current.Conditions.All(x => GoapResolver.ConditionIsSatisfied(x, worldState));
                 if (allConditionsSatisfied)
@@ -58,17 +59,18 @@ namespace GOAP.Runtime.Internal
                         path.Enqueue(current.Action);
                         current = current.ParentNode;
                     }
-                    
+
                     return new ActionPlan(goal, path, totalCost);
                 }
-                
+
                 foreach (GoapAction action in actions)
                 {
-                    if (!GoapResolver.EffectsSatisfyConditions(action.Effects, current.Conditions))
+                    if (!GoapResolver.EffectsSatisfyConditions(action.Effects, current.ConditionMap))
                         continue;
-                    
-                    HashSet<GoapCondition> newConditions = GoapResolver.ApplyEffects(action, current.Conditions);
-                    
+
+                    HashSet<GoapCondition> newConditions =
+                        GoapResolver.ApplyEffects(action.EffectMap, current.Conditions);
+
                     newConditions = GoapResolver.CombineConditionSets(newConditions, action.Conditions);
 
                     // Conditions of this action contradicted pre-existing conditions
@@ -77,20 +79,67 @@ namespace GOAP.Runtime.Internal
                         continue;
                     }
 
-                    int heuristic = newConditions.Count(
-                        x => !GoapResolver.ConditionIsSatisfied(x, worldState)
+                    int heuristic = newConditions.Sum(x => 
+                        GoapResolver.ConditionIsSatisfied(x, worldState) ? 0 : 1
                     );
+                    
+
+                    // foreach (GoapCondition newCondition in newConditions)
+                    // {
+                    //     if (!GoapResolver.ConditionIsSatisfied(newCondition, worldState))
+                    //     {
+                    //         heuristic += CalculateHeuristic(worldState, newCondition);
+                    //     }
+                    // }
+                    
                     int nodeCost = action.CalculateCost(worldState) + current.Cost;
                     int priority = nodeCost + heuristic;
-                    
+
                     PlannerNode newNode = new PlannerNode(newConditions, current, nodeCost, action);
                     priorityQueue.Enqueue(newNode, priority);
                 }
             }
-            
+
             return null;
         }
+
+        private static int CalculateHeuristic(IWorldState worldState, GoapCondition newCondition)
+        {
+            string key = newCondition.Key;
+            switch (newCondition.GoapDataType)
+            {
+                case GoapDataType.Int:
+                    int currentInt = worldState.Get<int>(key);
+                    int condInt = (int)newCondition.Value;
+                    return currentInt - condInt;
+                    return newCondition.ConditionDirection switch
+                    {
+                        ConditionDirection.GreaterThanEq => Mathf.Max(0, condInt - currentInt),
+                        ConditionDirection.LessThanEq => Mathf.Max(0, currentInt - condInt),
+                        ConditionDirection.Equals => condInt == currentInt ? 0 : 1,
+                        ConditionDirection.NotEquals => condInt != currentInt ? 0 : 1,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                case GoapDataType.Float:
+                    float currentF = worldState.Get<float>(key);
+                    float condFloat = (float)newCondition.Value;
+                    return Mathf.RoundToInt(currentF - condFloat);
+                    return newCondition.ConditionDirection switch
+                    {
+                        ConditionDirection.GreaterThanEq => Mathf.RoundToInt(Mathf.Max(0, condFloat - currentF)),
+                        ConditionDirection.LessThanEq => Mathf.RoundToInt(Mathf.Max(0, currentF - condFloat)),
+                        ConditionDirection.Equals => Mathf.Approximately(condFloat, currentF) ? 0 : 1,
+                        ConditionDirection.NotEquals => !Mathf.Approximately(condFloat,currentF) ? 0 : 1,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                case GoapDataType.Bool:
+                case GoapDataType.Enum:
+                    return newCondition.Value.Equals(worldState.Get<object>(key)) ? 0 : 1;
+            }
+
+            return 0;
+        }
         
-        // private Dictionary<IWorldState, int>
+        
     }
 }

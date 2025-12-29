@@ -8,7 +8,9 @@ namespace GOAP.Runtime
         public string ActionName { get; private set; }
         public Func<IWorldState, int> CalculateCost { get; private set; }
         public HashSet<GoapCondition> Conditions { get; private set; }
+        public Dictionary<string, GoapCondition> ConditionMap { get; private set; }
         public HashSet<GoapEffect> Effects { get; private set; }
+        public Dictionary<string, GoapEffect> EffectMap { get; private set; }
         
         private readonly IActionStrategy actionStrategy;
 
@@ -20,6 +22,18 @@ namespace GOAP.Runtime
             CalculateCost = costFunc;
             Conditions = conditions;
             Effects = effects;
+
+            ConditionMap = new Dictionary<string, GoapCondition>();
+            foreach (GoapCondition goapCondition in conditions)
+            {
+                ConditionMap.Add(goapCondition.Key, goapCondition);
+            }
+
+            EffectMap = new Dictionary<string, GoapEffect>();
+            foreach (GoapEffect goapEffect in effects)
+            {
+                EffectMap.Add(goapEffect.Key, goapEffect);
+            }
         }
         
         public void StartAction() => actionStrategy.Start();

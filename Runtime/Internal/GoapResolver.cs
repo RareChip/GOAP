@@ -92,14 +92,9 @@ namespace GOAP.Runtime.Internal
             }
         }
         
-        public static bool EffectsSatisfyConditions(HashSet<GoapEffect> effects, HashSet<GoapCondition> conditions)
-        {
-            Dictionary<string, GoapCondition> conditionMap = new Dictionary<string, GoapCondition>();
-            foreach (GoapCondition condition in conditions)
-            {
-                conditionMap.Add(condition.Key, condition);
-            }
-
+        public static bool EffectsSatisfyConditions(HashSet<GoapEffect> effects, 
+            Dictionary<string,GoapCondition> conditionMap)
+        { 
             bool satisfiesSomething = false;
             foreach (GoapEffect effect in effects)
             {
@@ -156,22 +151,18 @@ namespace GOAP.Runtime.Internal
             return satisfiesSomething;
         }
         
-        public static HashSet<GoapCondition> ApplyEffects(GoapAction action, HashSet<GoapCondition> conditions)
+        public static HashSet<GoapCondition> ApplyEffects(Dictionary<string,GoapEffect> effectMap, 
+            HashSet<GoapCondition> conditions)
         {
             HashSet<GoapCondition> newConditions = new HashSet<GoapCondition>();
             
             foreach (GoapCondition condition in conditions)
             {
                 GoapCondition newCondition = condition;
-                
-                foreach (GoapEffect effect in action.Effects)
-                {
-                    if (condition.Key != effect.Key)
-                        continue;
 
+                if (effectMap.TryGetValue(condition.Key, out GoapEffect effect))
+                {
                     newCondition = ApplyEffectToCondition(effect, condition);
-                    
-                    break;
                 }
                 
                 if(!newCondition.Equals(default))
@@ -230,20 +221,20 @@ namespace GOAP.Runtime.Internal
             }
         }
 
-        public static HashSet<GoapCondition> CombineConditionSets(HashSet<GoapCondition> set1, HashSet<GoapCondition> set2)
+        public static HashSet<GoapCondition> CombineConditionSets(HashSet<GoapCondition> set1,HashSet<GoapCondition> set2)
         {
             HashSet<GoapCondition> combinedSet = new HashSet<GoapCondition>();
             HashSet<string> combinedKeys = new HashSet<string>();
-            Dictionary<string, GoapCondition> otherSetConditions = new Dictionary<string, GoapCondition>();
-            
-            foreach (GoapCondition condition in set2)
-            {
-                otherSetConditions.Add(condition.Key, condition);
-            }
+            Dictionary<string, GoapCondition> otherCondMap = new Dictionary<string, GoapCondition>();
 
+            foreach (GoapCondition goapCondition in set2)
+            {
+                otherCondMap.Add(goapCondition.Key, goapCondition);
+            }
+            
             foreach (GoapCondition goapCondition in set1)
             {
-                if (!otherSetConditions.TryGetValue(goapCondition.Key, out GoapCondition other))
+                if (!otherCondMap.TryGetValue(goapCondition.Key, out GoapCondition other))
                 {
                     combinedSet.Add(goapCondition);
                 }
@@ -313,7 +304,7 @@ namespace GOAP.Runtime.Internal
 
             }
 
-            foreach (GoapCondition goapCondition in set2)
+            foreach (GoapCondition goapCondition in otherCondMap.Values)
             {
                 if (combinedKeys.Contains(goapCondition.Key))
                     continue;
@@ -322,16 +313,6 @@ namespace GOAP.Runtime.Internal
             }
             
             return combinedSet;
-        }
-
-        public static bool IsSubset(PlannerNode node, HashSet<PlannerNode> existingNodes)
-        {
-            foreach (PlannerNode existingNode in existingNodes)
-            {
-                
-            }
-
-            return false;
         }
 
         private static Exception TypeException()

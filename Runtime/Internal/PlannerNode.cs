@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GOAP.Runtime.Util;
+using UnityEngine;
 
 namespace GOAP.Runtime.Internal
 {
@@ -56,12 +58,12 @@ namespace GOAP.Runtime.Internal
             return hash;
         }
 
+        // The issue is that some actions have more than one effect, meaning something being the "only"
+        // difference isnt good enough.
         public bool IsJustAsGood(PlannerNode other, IWorldState worldState)
         {
-            // if (Conditions.Count != other.Conditions.Count)
+            // if (this.Conditions.Count > other.Conditions.Count)
             //     return false;
-            //
-            // List<(GoapCondition, GoapCondition)> differingConditions = new List<(GoapCondition, GoapCondition)>();
             //
             // foreach (GoapCondition otherCond in other.Conditions)
             // {
@@ -71,18 +73,42 @@ namespace GOAP.Runtime.Internal
             //     if (myCond.ConditionDirection != otherCond.ConditionDirection)
             //         return false;
             //
-            //     if (myCond.Value != otherCond.Value)
+            //     if (!myCond.Value.Equals(otherCond.Value))
             //     {
-            //         differingConditions.Add((myCond,otherCond));
+            //         if (!IsConditionEasier(myCond, otherCond))
+            //             return false;
             //     }
             //
             // }
             //
-            // return differingConditions.TrueForAll(x => 
-            //     GoapResolver.ConditionIsSatisfied(x.Item1, worldState)
-            //     && GoapResolver.ConditionIsSatisfied(x.Item2, worldState));
+            // return true;
+            
             return GetHashCode(worldState) == other.GetHashCode(worldState);
         }
         
+        private bool IsConditionEasier(GoapCondition myCond, GoapCondition otherCond)
+        {
+            switch (myCond.ConditionDirection)
+            {
+                case ConditionDirection.GreaterThanEq:
+                    if (myCond.GoapDataType == GoapDataType.Int)
+                        return (int)myCond.Value <= (int)otherCond.Value;
+                    if (myCond.GoapDataType == GoapDataType.Float)
+                        return (float)myCond.Value <= (float)otherCond.Value;
+                    break;
+
+                case ConditionDirection.LessThanEq:
+                    if (myCond.GoapDataType == GoapDataType.Int)
+                        return (int)myCond.Value >= (int)otherCond.Value;
+                    if (myCond.GoapDataType == GoapDataType.Float)
+                        return (float)myCond.Value >= (float)otherCond.Value;
+                    break;
+
+                case ConditionDirection.Equals:
+                case ConditionDirection.NotEquals:
+                    return myCond.Value.Equals(otherCond.Value);
+            }
+            return false;
+        }
     }
 }

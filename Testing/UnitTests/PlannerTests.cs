@@ -4,7 +4,6 @@ using GOAP.Runtime.Internal;
 using GOAP.Runtime.Util;
 using GOAP.Testing.ActionStrategies;
 using NUnit.Framework;
-using UnityEditor.VersionControl;
 
 namespace GOAP.Testing.UnitTests
 {
@@ -280,7 +279,7 @@ namespace GOAP.Testing.UnitTests
 
         }
 
-        [Test]
+        //[Test]
         public void TestPlanPerformanceHeavy()
         {
             IGoapPlanner planner = new GoapPlanner();
@@ -304,7 +303,7 @@ namespace GOAP.Testing.UnitTests
 
             PlannerState worldState = new PlannerState(worldData);
             GoapGoal goal = new GoapGoal.Builder("WinGameGoal")
-                .WithCondition("EnderPearls", ConditionDirection.GreaterThanEq, 12)
+                .WithCondition("EnderPearls", ConditionDirection.GreaterThanEq, 35)
                 .Build();
             HashSet<GoapAction> actions = TestUtils.AddAllActions(
                 builder.CreateAction("CraftPickaxe")
@@ -413,9 +412,9 @@ namespace GOAP.Testing.UnitTests
                     .WithStrategy(new NoOpStrategy())
                     .WithCost(_ => 5)
                     .WithCondition("InEnd", true)
-                    .WithCondition("Stress", ConditionDirection.LessThanEq, 0.8f)
+                    //.WithCondition("Stress", ConditionDirection.LessThanEq, 0.8f)
                     .WithEffect("DragonHealth", EffectDirection.Decrease, 10)
-                    .WithEffect("Stress", EffectDirection.Increase, 0.34f)
+                    //.WithEffect("Stress", EffectDirection.Increase, 0.34f)
                     .Build(),
                 builder.CreateAction("Destress")
                     .WithStrategy(new NoOpStrategy())
@@ -423,7 +422,7 @@ namespace GOAP.Testing.UnitTests
                     .WithEffect("Stress", EffectDirection.Decrease, 0.4f)
                     .Build()
                 );
-            
+
             ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
         }

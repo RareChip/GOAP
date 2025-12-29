@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace GOAP.Runtime.Internal
@@ -20,7 +21,7 @@ namespace GOAP.Runtime.Internal
 
             if (value is T v) 
                 return v;
-
+            
             Debug.LogError("Value of Key [" + key + "] is not of type [" + typeof(T) + "].");
             return default;
         }
