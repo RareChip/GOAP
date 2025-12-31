@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GOAP.Runtime.Util;
@@ -19,10 +20,11 @@ namespace GOAP.Runtime.Internal
             
             HashSet<ForwardNode> visitedNodes = new HashSet<ForwardNode>();
             PriorityQueue<ForwardNode, int> priorityQueue = new PriorityQueue<ForwardNode, int>();
-
+            Dictionary<string, List<(GoapCondition, int)>> costMap = GenerateCostMap(actions, goal, worldState);
+            
             ForwardNode startingNode = new ForwardNode(worldState.Clone(), null, 0, null);
             priorityQueue.Enqueue(startingNode, 0);
-            //visitedNodes.Add(startingNode);
+
             while (priorityQueue.Count > 0)
             {
                 ForwardNode current = priorityQueue.Dequeue();
@@ -95,12 +97,26 @@ namespace GOAP.Runtime.Internal
                     int cost = current.Cost + action.CalculateCost(worldState);
                     int heuristic = goal.Conditions.Count(x => !GoapResolver.ConditionIsSatisfied(x, newState));
                     ForwardNode newNode = new ForwardNode(newState, current, cost, action);
-                    
                     priorityQueue.Enqueue(newNode, cost + heuristic);
                 }
             }
             
             return null;
+        }
+
+        private Dictionary<string, List<(GoapCondition, int)>> GenerateCostMap(HashSet<GoapAction> actions, GoapGoal goal, IWorldState worldState)
+        {
+            Dictionary<string, List<(GoapCondition, int)>> costMap =
+                new Dictionary<string, List<(GoapCondition, int)>>();
+
+            int currentLevel = 0;
+
+            foreach (GoapAction action in actions)
+            {
+                
+            }
+            
+            return costMap;
         }
     }
 }

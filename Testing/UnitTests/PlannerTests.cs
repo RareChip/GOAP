@@ -412,14 +412,15 @@ namespace GOAP.Testing.UnitTests
                     .WithStrategy(new NoOpStrategy())
                     .WithCost(_ => 5)
                     .WithCondition("InEnd", true)
-                    //.WithCondition("Stress", ConditionDirection.LessThanEq, 0.8f)
-                    .WithEffect("DragonHealth", EffectDirection.Decrease, 10)
+                  //  .WithCondition("Stress", ConditionDirection.LessThanEq, 0.8f)
+                    .WithEffect("DragonHealth", EffectDirection.Decrease, 15)
                     //.WithEffect("Stress", EffectDirection.Increase, 0.34f)
                     .Build(),
                 builder.CreateAction("Destress")
                     .WithStrategy(new NoOpStrategy())
                     .WithCost(_ => 1)
-                    //.WithEffect("Stress", EffectDirection.Decrease, 0.4f)
+                    .WithCondition("Stress", ConditionDirection.GreaterThanEq, 0)
+                    .WithEffect("Stress", EffectDirection.Decrease, 0.4f)
                     .Build()
                 );
 
