@@ -13,7 +13,7 @@ namespace GOAP.Testing.UnitTests
         [Test]
         public void TestGeneratePlanNullInputs()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
 
             ActionPlan plan = planner.GeneratePlan(null, null, null);
             Assert.Null(plan);
@@ -31,7 +31,7 @@ namespace GOAP.Testing.UnitTests
         [Test]
         public void TestSimplePlan()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             HashSet<GoapAction> actions = new HashSet<GoapAction>();
             IGoapActionBuilder builder = new GoapActionBuilder();
             GoapGoal goal = new GoapGoal.Builder("BuildWallsGoal")
@@ -69,7 +69,7 @@ namespace GOAP.Testing.UnitTests
         [Test]
         public void TestSimplePlanTwoConditions()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             HashSet<GoapAction> actions = new HashSet<GoapAction>();
             IGoapActionBuilder builder = new GoapActionBuilder();
             GoapGoal goal = new GoapGoal.Builder("BuildWallsGoal")
@@ -106,7 +106,7 @@ namespace GOAP.Testing.UnitTests
         [Test]
         public void TestComplexPlan()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             HashSet<GoapAction> actions = new HashSet<GoapAction>();
             IGoapActionBuilder builder = new GoapActionBuilder();
             GoapGoal goal = new GoapGoal.Builder("BuildWallsGoal")
@@ -174,7 +174,7 @@ namespace GOAP.Testing.UnitTests
         [Test]
         public void TestPlanLongRegression()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("PickaxeCrafted", false);
@@ -279,10 +279,10 @@ namespace GOAP.Testing.UnitTests
 
         }
 
-        //[Test]
+        [Test]
         public void TestPlanPerformanceHeavy()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("PickaxeCrafted", false);
@@ -303,7 +303,7 @@ namespace GOAP.Testing.UnitTests
 
             PlannerState worldState = new PlannerState(worldData);
             GoapGoal goal = new GoapGoal.Builder("WinGameGoal")
-                .WithCondition("EnderPearls", ConditionDirection.GreaterThanEq, 35)
+                .WithCondition("DragonHealth", ConditionDirection.LessThanEq, 0)
                 .Build();
             HashSet<GoapAction> actions = TestUtils.AddAllActions(
                 builder.CreateAction("CraftPickaxe")
@@ -419,18 +419,19 @@ namespace GOAP.Testing.UnitTests
                 builder.CreateAction("Destress")
                     .WithStrategy(new NoOpStrategy())
                     .WithCost(_ => 1)
-                    .WithEffect("Stress", EffectDirection.Decrease, 0.4f)
+                    //.WithEffect("Stress", EffectDirection.Decrease, 0.4f)
                     .Build()
                 );
 
             ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
         }
 
         [Test]
-        public void TestPlanFindsBestPath()
+        public void TestPlanFindsEfficientPath()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("Health", 0);
@@ -460,11 +461,45 @@ namespace GOAP.Testing.UnitTests
 
             Assert.AreEqual(100,worldState.Get<int>("Health"));
         }
+        
+        [Test]
+        public void TestPlanFindsBestPath()
+        {
+            IGoapPlanner planner = TestUtils.GetPlanner();
+            IGoapActionBuilder builder = new GoapActionBuilder();
+            Dictionary<string, object> worldData = new Dictionary<string, object>();
+            worldData.Add("EnemyHealth", 100);
+
+            PlannerState worldState = new PlannerState(worldData);
+            GoapGoal goal = new GoapGoal.Builder("KillEnemy")
+                .WithCondition("EnemyHealth", ConditionDirection.LessThanEq, 0)
+                .Build();
+            HashSet<GoapAction> actions = TestUtils.AddAllActions(
+                builder.CreateAction("UltimateAttack")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 100)
+                    .WithEffect("EnemyHealth", EffectDirection.Decrease, 100)
+                    .Build(),
+                builder.CreateAction("NormalAttack")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 10)
+                    .WithEffect("EnemyHealth", EffectDirection.Decrease, 25)
+                    .Build());
+            
+            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            Assert.NotNull(plan);
+            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
+            Assert.AreEqual(40, plan.TotalCost);
+            Assert.AreEqual(4, plan.Actions.Count);
+            Assert.AreEqual("KillEnemy", plan.Goal.GoalName);
+
+            Assert.AreEqual(0,worldState.Get<int>("EnemyHealth"));
+        }
 
         [Test]
         public void TestPlanContradictions()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("Money", 25);
@@ -500,7 +535,7 @@ namespace GOAP.Testing.UnitTests
         [Test]
         public void TestPlanMergingConditions()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("Health", 10f);
@@ -546,7 +581,7 @@ namespace GOAP.Testing.UnitTests
         [Test]
         public void TestPlanImpossible()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("BeastHealth", 10);
@@ -572,7 +607,7 @@ namespace GOAP.Testing.UnitTests
         [Test]
         public void TestInfinitePlanImpossible()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("Money", 10);
@@ -607,7 +642,7 @@ namespace GOAP.Testing.UnitTests
         [Test]
         public void TestPlanNegativeCondition()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("Temp", -20);
@@ -642,15 +677,16 @@ namespace GOAP.Testing.UnitTests
                     .Build()
             );
             ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
             Assert.AreEqual(48,plan.TotalCost);
             Assert.AreEqual(8,plan.Actions.Count);
         }
 
         [Test]
-        public void TestFindsBestPathWithContradictions()
+        public void TestFindsCheapestPathWithContradictions()
         {
-            IGoapPlanner planner = new GoapPlanner();
+            IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("AtBossLocation", true);
@@ -697,9 +733,186 @@ namespace GOAP.Testing.UnitTests
             );
             
             ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
             Assert.AreEqual(47,plan.TotalCost);
             Assert.AreEqual(6,plan.Actions.Count);
+        }
+
+        [Test]
+        public void TestPlanPerformanceHeavyBooleansOnly()
+        {
+            IGoapPlanner planner = TestUtils.GetPlanner();
+            IGoapActionBuilder builder = new GoapActionBuilder();
+            Dictionary<string, object> worldData = new Dictionary<string, object>();
+            worldData.Add("MonsterKilled", false);
+            worldData.Add("HasWeapon", false);
+            worldData.Add("IsHealthy", false);
+            worldData.Add("IsHungry", true);
+            worldData.Add("HasMaterials", false);
+            worldData.Add("HasFood", false);
+            worldData.Add("AtFarm", false);
+            worldData.Add("HasFriends", false);
+            worldData.Add("InGoodMood", false);
+            worldData.Add("HasCat", false);
+            worldData.Add("HasMedicalDiagnosis", false);
+            worldData.Add("HasMedicine", false);
+            worldData.Add("HasWater", false);
+            worldData.Add("HasBucket", false);
+            worldData.Add("InLair", false);
+            worldData.Add("HasEnoughExp", false);
+            worldData.Add("TravelReady", false);
+            worldData.Add("SaidGoodbyes", false);
+            worldData.Add("ByeMom", false);
+            worldData.Add("ByeDad", false);
+            worldData.Add("ByeSis", false);
+            worldData.Add("ByeBro", false);
+
+            PlannerState worldState = new PlannerState(worldData);
+            GoapGoal goal = new GoapGoal.Builder("WinGameGoal")
+                .WithCondition("MonsterKilled", true)
+                .Build();
+            HashSet<GoapAction> actions = TestUtils.AddAllActions(
+                builder.CreateAction("KillMonster")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x =>1)
+                    .WithCondition("HasWeapon", true)
+                    .WithCondition("IsHealthy", true)
+                    .WithCondition("HasFriends", true)
+                    .WithCondition("IsHungry", false)
+                    .WithCondition("InLair", true)
+                    .WithEffect("MonsterKilled", true)
+                    .Build(),
+                builder.CreateAction("MakeWeapon")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 2)
+                    .WithCondition("HasMaterials", true)
+                    .WithCondition("IsHungry", false)
+                    .WithEffect("HasWeapon", true)
+                    .Build(),
+                builder.CreateAction("GatherMaterials")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithEffect("HasMaterials", true)
+                    .Build(),
+                builder.CreateAction("Eat")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithCondition("HasFood", true)
+                    .WithEffect("IsHungry", false)
+                    .Build(),
+                builder.CreateAction("FarmBread")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithCondition("AtFarm", true)
+                    .WithEffect("HasFood", true)
+                    .Build(),
+                builder.CreateAction("RaidHouse")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 5)
+                    .WithCondition("HasFriends", true)
+                    .WithEffect("HasFood", true)
+                    .WithEffect("HasMaterials", true)
+                    .Build(),
+                builder.CreateAction("MakeFriends")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 2)
+                    .WithCondition("InGoodMood", true)
+                    .WithEffect("HasFriends", true)
+                    .Build(),
+                builder.CreateAction("BoostMood")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 2)
+                    .WithCondition("HasCat", true)
+                    .WithEffect("InGoodMood", true)
+                    .Build(),
+                builder.CreateAction("VisitFarm")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithEffect("HasCat", true)
+                    .Build(),
+                builder.CreateAction("VisitDoctor")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 5)
+                    .WithEffect("HasMedicalDiagnosis", true)
+                    .Build(),
+                builder.CreateAction("ObtainMedicine")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 20)
+                    .WithCondition("HasMedicalDiagnosis", true)
+                    .WithEffect("HasMedicine", true)
+                    .Build(),
+                builder.CreateAction("TakeMedicine")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithCondition("HasWater", true)
+                    .WithEffect("IsHealthy", true)
+                    .Build(),
+                builder.CreateAction("GetWater")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 2)
+                    .WithCondition("HasBucket", true)
+                    .WithEffect("HasWater", true)
+                    .Build(),
+                builder.CreateAction("GetBucket")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithEffect("HasBucket", true)
+                    .WithEffect("HasMaterials", false)
+                    .Build(),
+                builder.CreateAction("TravelToLair")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 2)
+                    .WithCondition("HasEnoughExp", true)
+                    .WithEffect("InLair", true)
+                    .Build(),
+                builder.CreateAction("GrindLevels")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 7)
+                    .WithCondition("TravelReady", true)
+                    .WithCondition("HasWeapon", true)
+                    .WithEffect("HasEnoughExp", true)
+                    .Build(),
+                builder.CreateAction("Prepare")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 2)
+                    .WithCondition("SaidGoodbyes", true)
+                    .WithEffect("TravelReady", true)
+                    .Build(),
+                builder.CreateAction("SayGoodbyes")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 2)
+                    .WithCondition("ByeMom", true)
+                    .WithCondition("ByeDad", true)
+                    .WithCondition("ByeSis", true)
+                    .WithCondition("ByeBro", true)
+                    .WithEffect("SaidGoodbyes", true)
+                    .Build(),
+                builder.CreateAction("ByeMom")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithEffect("ByeMom", true)
+                    .Build(),
+                builder.CreateAction("ByeSis")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithEffect("ByeSis", true)
+                    .Build(),
+                builder.CreateAction("ByeBro")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithEffect("ByeBro", true)
+                    .Build(),
+                builder.CreateAction("ByeDad")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(x => 1)
+                    .WithEffect("ByeDad", true)
+                    .Build()
+                );
+
+            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            Assert.NotNull(plan);
+            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
         }
     }
 }

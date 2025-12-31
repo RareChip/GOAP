@@ -7,8 +7,12 @@ using NUnit.Framework;
 
 namespace GOAP.Testing
 {
-    public class TestUtils
+    public static class TestUtils
     {
+        public static IGoapPlanner GetPlanner()
+        {
+            return new GoapForwardPlanner();
+        }
         public static HashSet<GoapAction> AddAllActions(params GoapAction[] actions)
         {
             HashSet<GoapAction> actionsSet = new HashSet<GoapAction>();

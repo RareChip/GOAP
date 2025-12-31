@@ -27,7 +27,17 @@ namespace GOAP.Runtime.Agent
             return default;
         }
 
-        public PlannerState CreatePlannerState()
+        public void Update<T>(string key, T value)
+        {
+            // noop
+        }
+
+        public IWorldState Clone()
+        {
+            return CreatePlannerState();
+        }
+
+        public IWorldState CreatePlannerState()
         {
             Dictionary<string, object> calculatedSnapshot = new Dictionary<string, object>();
 

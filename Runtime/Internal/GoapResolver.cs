@@ -152,8 +152,9 @@ namespace GOAP.Runtime.Internal
         }
         
         public static HashSet<GoapCondition> ApplyEffects(Dictionary<string,GoapEffect> effectMap, 
-            HashSet<GoapCondition> conditions)
+            PlannerNode currentNode, IWorldState worldState)
         {
+            HashSet<GoapCondition> conditions = currentNode.Conditions;
             HashSet<GoapCondition> newConditions = new HashSet<GoapCondition>();
             
             foreach (GoapCondition condition in conditions)
@@ -162,7 +163,7 @@ namespace GOAP.Runtime.Internal
 
                 if (effectMap.TryGetValue(condition.Key, out GoapEffect effect))
                 {
-                    newCondition = ApplyEffectToCondition(effect, condition);
+                    newCondition = ApplyEffectToCondition(effect, condition, currentNode, worldState);
                 }
                 
                 if(!newCondition.Equals(default))
@@ -172,7 +173,8 @@ namespace GOAP.Runtime.Internal
             return newConditions;
         }
 
-        private static GoapCondition ApplyEffectToCondition(GoapEffect effect, GoapCondition condition)
+        private static GoapCondition ApplyEffectToCondition(GoapEffect effect, GoapCondition condition,
+        PlannerNode node, IWorldState worldState)
         {
             switch (effect.EffectDirection)
             {
@@ -192,11 +194,23 @@ namespace GOAP.Runtime.Internal
                         case GoapDataType.Int:
                             int newVal = (int)condition.Value - (int)effect.Value;
                             condition.Value = newVal;
+
+                            if (ConditionIsSatisfied(condition, worldState))
+                            {
+                                node.RemoveAndCacheCondition(condition);
+                                return default;
+                            }
                             
                             return condition;
                         case GoapDataType.Float:
                             float newFloat = (float)condition.Value - (float)effect.Value;
                             condition.Value = newFloat;
+                            
+                            if (ConditionIsSatisfied(condition, worldState))
+                            {
+                                node.RemoveAndCacheCondition(condition);
+                                return default;
+                            }
                             
                             return condition;
                         default:
@@ -208,10 +222,22 @@ namespace GOAP.Runtime.Internal
                         case GoapDataType.Int:
                             int newVal = (int)condition.Value + (int)effect.Value;
                             condition.Value = newVal;
+                            
+                            if (ConditionIsSatisfied(condition, worldState))
+                            {
+                                node.RemoveAndCacheCondition(condition);
+                                return default;
+                            }
                             return condition;
                         case GoapDataType.Float:
                             float newFloat = (float)condition.Value + (float)effect.Value;
                             condition.Value = newFloat;
+                            
+                            if (ConditionIsSatisfied(condition, worldState))
+                            {
+                                node.RemoveAndCacheCondition(condition);
+                                return default;
+                            }
                             return condition;
                         default:
                             throw new ArgumentOutOfRangeException();

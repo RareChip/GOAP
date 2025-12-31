@@ -43,7 +43,24 @@ namespace GOAP.Runtime.Internal
             data[key] = newValue;
         }
 
-        public PlannerState Clone()
+        public override bool Equals(object obj)
+        {
+            if (obj is not PlannerState other)
+                return false;
+
+            return other.data.Count == data.Count &&
+                   other.data.All(x => 
+                       data.TryGetValue(x.Key, out var v) && data[x.Key].Equals(v));
+        }
+
+        public override int GetHashCode()
+        {
+            int oldHash = HashCode.Combine(data.Count);
+
+            return data.Aggregate(oldHash, (current, pair) => HashCode.Combine(current, pair.Key, pair.Value));
+        }
+
+        public IWorldState Clone()
         {
             return new PlannerState(new Dictionary<string, object>(data));
         }
