@@ -6,43 +6,43 @@ using UnityEngine;
 
 namespace GOAP.Runtime.Internal
 {
-    public class PlannerNode
+    public class RegressiveNode
     {
         public HashSet<GoapCondition> Conditions { get; }
         public Dictionary<string, GoapCondition> ConditionMap { get; }
-        public PlannerNode ParentNode { get; private set; }
+        public RegressiveNode ParentNode { get; private set; }
         public int Cost { get; private set; }
         public GoapAction Action { get; private set; }
         public Dictionary<string, GoapCondition> CachedState { get; private set; }
 
-        public PlannerNode(HashSet<GoapCondition> conditions, PlannerNode parentNode, int cost, GoapAction action)
+        public RegressiveNode(HashSet<GoapCondition> conditions, RegressiveNode parentNode, int cost, GoapAction action)
         {
-            Conditions = conditions;
-            ParentNode = parentNode;
-            Cost = cost;
-            Action = action;
+            this.Conditions = conditions;
+            this.ParentNode = parentNode;
+            this.Cost = cost;
+            this.Action = action;
 
-            ConditionMap = new Dictionary<string, GoapCondition>();
+            this.ConditionMap = new Dictionary<string, GoapCondition>();
             foreach (GoapCondition goapCondition in conditions)
             {
-                ConditionMap.Add(goapCondition.Key, goapCondition);
+                this.ConditionMap.Add(goapCondition.Key, goapCondition);
             }
 
-            CachedState = new Dictionary<string, GoapCondition>();
+            this.CachedState = new Dictionary<string, GoapCondition>();
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is not PlannerNode other)
+            if (obj is not RegressiveNode other)
                 return false;
 
-            return Conditions.SetEquals(other.Conditions);
+            return this.Conditions.SetEquals(other.Conditions);
         }
 
         public override int GetHashCode()
         {
             int hash = 0;
-            foreach (GoapCondition goapCondition in Conditions)
+            foreach (GoapCondition goapCondition in this.Conditions)
             {
                 hash ^= goapCondition.GetHashCode();
             }
@@ -53,7 +53,7 @@ namespace GOAP.Runtime.Internal
         public int GetHashCode(IWorldState worldState)
         {
             int hash = 0;
-            foreach (GoapCondition goapCondition in Conditions)
+            foreach (GoapCondition goapCondition in this.Conditions)
             {
                 hash += goapCondition.GetHashCode(worldState);
             }
@@ -63,14 +63,14 @@ namespace GOAP.Runtime.Internal
 
         // The issue is that some actions have more than one effect, meaning something being the "only"
         // difference isnt good enough.
-        public bool IsJustAsGood(PlannerNode other, IWorldState worldState)
+        public bool IsJustAsGood(RegressiveNode other, IWorldState worldState)
         {
             if (this.Conditions.Count > other.Conditions.Count)
                 return false;
             
             foreach (GoapCondition otherCond in other.Conditions)
             {
-                if (!ConditionMap.TryGetValue(otherCond.Key, out GoapCondition myCond))
+                if (!this.ConditionMap.TryGetValue(otherCond.Key, out GoapCondition myCond))
                     return false;
             
                 if (myCond.ConditionDirection != otherCond.ConditionDirection)
@@ -78,7 +78,7 @@ namespace GOAP.Runtime.Internal
             
                 if (!myCond.Value.Equals(otherCond.Value))
                 {
-                    if (!IsConditionEasier(myCond, otherCond))
+                    if (!this.IsConditionEasier(myCond, otherCond))
                         return false;
                 }
             
@@ -86,7 +86,7 @@ namespace GOAP.Runtime.Internal
             
             return true;
             
-            return GetHashCode(worldState) == other.GetHashCode(worldState);
+            return this.GetHashCode(worldState) == other.GetHashCode(worldState);
         }
         
         private bool IsConditionEasier(GoapCondition myCond, GoapCondition otherCond)

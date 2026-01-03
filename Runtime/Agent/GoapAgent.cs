@@ -16,10 +16,10 @@ namespace GOAP.Runtime.Agent
         private ActionPlan currentPlan;
         private void Awake()
         {
-            worldState = goapConfiguration.CreateWorldState();
-            actions = goapConfiguration.CreateActions(new GoapActionBuilder());
-            goals = goapConfiguration.CreateGoals();
-            planner = new GoapPlanner();
+            this.worldState = this.goapConfiguration.CreateWorldState();
+            this.actions = this.goapConfiguration.CreateActions(new GoapActionBuilder());
+            this.goals = this.goapConfiguration.CreateGoals();
+            this.planner = new GoapRegressivePlanner();
         }
 
         private void Update()

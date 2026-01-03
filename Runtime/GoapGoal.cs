@@ -12,9 +12,9 @@ namespace GOAP.Runtime
 
         public GoapGoal(string name, HashSet<GoapCondition> conditions, Func<float> calculateInsistence)
         {
-            GoalName = name;
-            Conditions = conditions;
-            CalculateInsistence = calculateInsistence;
+            this.GoalName = name;
+            this.Conditions = conditions;
+            this.CalculateInsistence = calculateInsistence;
         }
         
         public class Builder
@@ -26,13 +26,13 @@ namespace GOAP.Runtime
             public Builder(string name)
             {
                 this.name = name;
-                conditions = new HashSet<GoapCondition>();
-                calculateInsistence = () => 1;
+                this.conditions = new HashSet<GoapCondition>();
+                this.calculateInsistence = () => 1;
             }
             
             public Builder WithCondition(string key, ConditionDirection direction, object value)
             {
-                return WithCondition(new GoapCondition
+                return this.WithCondition(new GoapCondition
                 {
                     Key = key,
                     ConditionDirection = direction,
@@ -43,7 +43,7 @@ namespace GOAP.Runtime
             
             public Builder WithCondition(string key, bool value)
             {
-                return WithCondition(new GoapCondition
+                return this.WithCondition(new GoapCondition
                 {
                     Key = key,
                     ConditionDirection = ConditionDirection.Equals,
@@ -56,20 +56,20 @@ namespace GOAP.Runtime
             {
                 if (!GoapUtils.VerifyCondition(condition))
                     throw new Exception("Incorrect format of condition!");
-            
-                conditions.Add(condition);
+
+                this.conditions.Add(condition);
                 return this;
             }
 
             public Builder WithInsistence(Func<float> insistenceFunc)
             {
-                calculateInsistence = insistenceFunc;
+                this.calculateInsistence = insistenceFunc;
                 return this;
             }
 
             public GoapGoal Build()
             {
-                return new GoapGoal(name, conditions, calculateInsistence);
+                return new GoapGoal(this.name, this.conditions, this.calculateInsistence);
             }
         }
     }

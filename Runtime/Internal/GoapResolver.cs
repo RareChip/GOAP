@@ -7,90 +7,10 @@ namespace GOAP.Runtime.Internal
 {
     public static class GoapResolver
     {
-        private const float EPSILON = 0.0001f;
-        
-        public static bool ConditionIsSatisfied(GoapCondition condition, IWorldState plannerState)
-        {
-            switch (condition.GoapDataType)
-            {
-                case GoapDataType.Bool:
-                    if (condition.Value is not bool b)
-                    {
-                        throw TypeException();
-                    }
-                    
-                    bool boolVal = plannerState.Get<bool>(condition.Key);
-                    switch (condition.ConditionDirection)
-                    { 
-                        case ConditionDirection.Equals:
-                            return boolVal == b;
-                        case ConditionDirection.NotEquals:
-                            return boolVal != b;
-                        default:
-                            throw ComparisonException();
-                    }
-                    
-                case GoapDataType.Int:
-                    if (condition.Value is not int i)
-                    {
-                        throw TypeException();
-                    }
-
-                    int intVal = plannerState.Get<int>(condition.Key);
-                    switch (condition.ConditionDirection)
-                    {
-                        case ConditionDirection.Equals:
-                            return intVal == i;
-                        case ConditionDirection.NotEquals:
-                            return intVal != i;
-                        case ConditionDirection.GreaterThanEq:
-                            return intVal >= i;
-                        case ConditionDirection.LessThanEq:
-                            return intVal <= i;
-                        default:
-                            throw ComparisonException();
-                    }
-                    
-                case GoapDataType.Float:
-                    if (condition.Value is not float f)
-                    {
-                        throw TypeException();
-                    }
-                    
-                    float floatVal = plannerState.Get<float>(condition.Key);
-                    
-                    switch (condition.ConditionDirection)
-                    {
-                        case ConditionDirection.Equals:
-                            return Math.Abs(floatVal - f) < EPSILON;
-                        case ConditionDirection.GreaterThanEq:
-                            return floatVal >= f;
-                        case ConditionDirection.LessThanEq:
-                            return floatVal <= f;
-                        default:
-                            throw ComparisonException();
-                    };
-                case GoapDataType.Enum:
-                    if (condition.Value is not int e)
-                    {
-                        throw TypeException();
-                    }
-
-                    int enumVal = plannerState.Get<int>(condition.Key);
-                    
-                    switch (condition.ConditionDirection)
-                    {
-                        case ConditionDirection.Equals:
-                            return enumVal == e;
-                        case ConditionDirection.NotEquals:
-                            return enumVal != e;
-                        default:
-                            throw ComparisonException();
-                    }
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
+        public static Exception TypeException =>
+            new Exception("Condition compared against incorrect type in world state!");
+        public static Exception ComparisonException =>
+            new Exception("Condition has correct type, but an incompatible comparison method!");
         
         public static bool EffectsSatisfyConditions(HashSet<GoapEffect> effects, 
             Dictionary<string,GoapCondition> conditionMap)
@@ -152,7 +72,7 @@ namespace GOAP.Runtime.Internal
         }
         
         public static HashSet<GoapCondition> ApplyEffects(Dictionary<string,GoapEffect> effectMap, 
-            PlannerNode currentNode, IWorldState worldState)
+            RegressiveNode currentNode, IWorldState worldState)
         {
             HashSet<GoapCondition> conditions = currentNode.Conditions;
             HashSet<GoapCondition> newConditions = new HashSet<GoapCondition>();
@@ -174,7 +94,7 @@ namespace GOAP.Runtime.Internal
         }
 
         private static GoapCondition ApplyEffectToCondition(GoapEffect effect, GoapCondition condition,
-        PlannerNode node, IWorldState worldState)
+        RegressiveNode node, IWorldState worldState)
         {
             switch (effect.EffectDirection)
             {
@@ -195,7 +115,7 @@ namespace GOAP.Runtime.Internal
                             int newVal = (int)condition.Value - (int)effect.Value;
                             condition.Value = newVal;
 
-                            if (ConditionIsSatisfied(condition, worldState))
+                            if (worldState.ConditionIsSatisfied(condition))
                             {
                                 node.RemoveAndCacheCondition(condition);
                                 return default;
@@ -206,7 +126,7 @@ namespace GOAP.Runtime.Internal
                             float newFloat = (float)condition.Value - (float)effect.Value;
                             condition.Value = newFloat;
                             
-                            if (ConditionIsSatisfied(condition, worldState))
+                            if (worldState.ConditionIsSatisfied(condition))
                             {
                                 node.RemoveAndCacheCondition(condition);
                                 return default;
@@ -223,7 +143,7 @@ namespace GOAP.Runtime.Internal
                             int newVal = (int)condition.Value + (int)effect.Value;
                             condition.Value = newVal;
                             
-                            if (ConditionIsSatisfied(condition, worldState))
+                            if (worldState.ConditionIsSatisfied(condition))
                             {
                                 node.RemoveAndCacheCondition(condition);
                                 return default;
@@ -233,7 +153,7 @@ namespace GOAP.Runtime.Internal
                             float newFloat = (float)condition.Value + (float)effect.Value;
                             condition.Value = newFloat;
                             
-                            if (ConditionIsSatisfied(condition, worldState))
+                            if (worldState.ConditionIsSatisfied(condition))
                             {
                                 node.RemoveAndCacheCondition(condition);
                                 return default;
@@ -339,16 +259,6 @@ namespace GOAP.Runtime.Internal
             }
             
             return combinedSet;
-        }
-
-        private static Exception TypeException()
-        {
-            return new Exception("Condition compared against incorrect type in world state!");
-        }
-
-        private static Exception ComparisonException()
-        {
-            return new Exception("Condition has correct type, but an incompatible comparison method!");
         }
 
     }

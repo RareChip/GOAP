@@ -284,26 +284,181 @@ namespace GOAP.Testing.UnitTests
         {
             IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
-            Dictionary<string, object> worldData = new Dictionary<string, object>();
-            worldData.Add("PickaxeCrafted", false);
-            worldData.Add("AtFurnace", true);
-            worldData.Add("AtCraftingTable", false);
-            worldData.Add("AtTree", false);
-            worldData.Add("AtMine", false);
-            worldData.Add("IngotCount", 0);
-            worldData.Add("OreCount", 0);
-            worldData.Add("StickCount", 0);
-            worldData.Add("WoodCount", 0);
-            worldData.Add("HasAxe", false);
-            worldData.Add("InEnd", false);
-            worldData.Add("EnderPearls", 0);
-            worldData.Add("HasSword", false);
-            worldData.Add("DragonHealth", 100);
-            worldData.Add("Stress", 0f);
+            Dictionary<string, object> worldData = new()
+            {
+                { "PickaxeCrafted", false },
+                { "AtFurnace", false },
+                { "AtCraftingTable", true },
+                { "AtTree", false },
+                { "AtMine", false },
+                { "IngotCount", 0 },
+                { "OreCount", 0 },
+                { "StickCount", 0 },
+                { "WoodCount", 0 },
+                { "HasAxe", false },
+                { "InEnd", false },
+                { "EnderPearls", 0 },
+                { "HasSword", false },
+                { "DragonHealth", 100 },
+                { "Stress", 0f }
+            };
 
             PlannerState worldState = new PlannerState(worldData);
             GoapGoal goal = new GoapGoal.Builder("WinGameGoal")
                 .WithCondition("DragonHealth", ConditionDirection.LessThanEq, 0)
+                .WithCondition("InEnd", true)
+                .Build();
+            HashSet<GoapAction> actions = TestUtils.AddAllActions(
+                builder.CreateAction("CraftPickaxe")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 5)
+                    .WithCondition("StickCount", ConditionDirection.GreaterThanEq, 2)
+                    .WithCondition("IngotCount", ConditionDirection.GreaterThanEq, 3)
+                    .WithCondition("AtCraftingTable", true)
+                    .WithEffect("PickaxeCrafted", true)
+                    .Build(),
+                builder.CreateAction("SmeltOre")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 2)
+                    .WithCondition("AtFurnace", true)
+                    .WithCondition("OreCount", ConditionDirection.GreaterThanEq, 1)
+                    .WithEffect("IngotCount", EffectDirection.Increase, 1)
+                    .WithEffect("OreCount", EffectDirection.Decrease, 1)
+                    .Build(),
+                builder.CreateAction("ChopWood")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 3)
+                    .WithCondition("AtTree", true)
+                    .WithCondition("HasAxe", true)
+                    .WithEffect("WoodCount", EffectDirection.Increase, 3)
+                    .WithEffect("AtTree", false)
+                    .Build(),
+                builder.CreateAction("EquipAxe")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 1)
+                    .WithEffect("HasAxe", true)
+                    .Build(),
+                builder.CreateAction("GoToTree")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 3)
+                    .WithEffect("AtTree", true)
+                    .WithEffect("AtFurnace", false)
+                    .WithEffect("AtMine", false)
+                    .WithEffect("AtCraftingTable",false)
+                    .Build(),
+                builder.CreateAction("GoToFurnace")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 3)
+                    .WithEffect("AtTree", false)
+                    .WithEffect("AtFurnace", true)
+                    .WithEffect("AtMine", false)
+                    .WithEffect("AtCraftingTable",false)
+                    .Build(),
+                builder.CreateAction("GoToCraftingTable")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 3)
+                    .WithEffect("AtTree", false)
+                    .WithEffect("AtFurnace", false)
+                    .WithEffect("AtMine", false)
+                    .WithEffect("AtCraftingTable",true)
+                    .Build(),
+                builder.CreateAction("GoToMine")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 3)
+                    .WithEffect("AtTree", false)
+                    .WithEffect("AtFurnace", false)
+                    .WithEffect("AtCraftingTable",false)
+                    .WithEffect("AtMine", true)
+                    .Build(),
+                builder.CreateAction("CraftSticks")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 1)
+                    .WithCondition("AtCraftingTable",true)
+                    .WithCondition("WoodCount", ConditionDirection.GreaterThanEq, 2)
+                    .WithEffect("StickCount", EffectDirection.Increase, 4)
+                    .Build(),
+                builder.CreateAction("LootChestForOre")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 40)
+                    .WithEffect("OreCount", EffectDirection.Increase, 1)
+                    .Build(),
+                builder.CreateAction("MineOre")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 5)
+                    .WithCondition("AtMine", true)
+                    .WithEffect("OreCount", EffectDirection.Increase, 1)
+                    .Build(),
+                builder.CreateAction("KillEnderman")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 2)
+                    .WithCondition("HasSword", true)
+                    .WithEffect("EnderPearls",EffectDirection.Increase, 2)
+                    .Build(),
+                builder.CreateAction("MakeEndPortal")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 5)
+                    .WithCondition("EnderPearls", ConditionDirection.GreaterThanEq, 12)
+                    .WithEffect("EnderPearls",EffectDirection.Decrease, 12)
+                    .WithEffect("InEnd", true)
+                    .Build(),
+                builder.CreateAction("CraftSword")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 1)
+                    .WithCondition("StickCount", ConditionDirection.GreaterThanEq, 1)
+                    .WithCondition("IngotCount", ConditionDirection.GreaterThanEq, 2)
+                    .WithCondition("AtCraftingTable", true)
+                    .WithEffect("StickCount", EffectDirection.Decrease, 1)
+                    .WithEffect("IngotCount", EffectDirection.Decrease, 2)
+                    .WithEffect("HasSword", true)
+                    .Build(),
+                builder.CreateAction("FightDragon")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 5)
+                    .WithCondition("InEnd", true)
+                    .WithCondition("Stress", ConditionDirection.LessThanEq, 0.8f)
+                    .WithEffect("DragonHealth", EffectDirection.Decrease, 15)
+                    .WithEffect("Stress", EffectDirection.Increase, 0.34f)
+                    .Build(),
+                builder.CreateAction("Destress")
+                    .WithStrategy(new NoOpStrategy())
+                    .WithCost(_ => 1)
+                    .WithCondition("Stress", ConditionDirection.GreaterThanEq, 0f)
+                    .WithEffect("Stress", EffectDirection.Decrease, 0.4f)
+                    .Build()
+                );
+
+            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            Assert.NotNull(plan);
+            TestUtils.AssertPlanMakesSense(plan, worldState, goal);
+        }
+        
+        [Test]
+        public void TestPlanManyActionsSimplePlan()
+        {
+            IGoapPlanner planner = TestUtils.GetPlanner();
+            IGoapActionBuilder builder = new GoapActionBuilder();
+            Dictionary<string, object> worldData = new()
+            {
+                { "PickaxeCrafted", false },
+                { "AtFurnace", true },
+                { "AtCraftingTable", false },
+                { "AtTree", false },
+                { "AtMine", false },
+                { "IngotCount", 0 },
+                { "OreCount", 0 },
+                { "StickCount", 0 },
+                { "WoodCount", 0 },
+                { "HasAxe", false },
+                { "InEnd", false },
+                { "EnderPearls", 0 },
+                { "HasSword", false },
+                { "DragonHealth", 100 },
+                { "Stress", 0f }
+            };
+
+            PlannerState worldState = new PlannerState(worldData);
+            GoapGoal goal = new GoapGoal.Builder("WinGameGoal")
+                .WithCondition("StickCount", ConditionDirection.GreaterThanEq, 10)
                 .Build();
             HashSet<GoapAction> actions = TestUtils.AddAllActions(
                 builder.CreateAction("CraftPickaxe")
@@ -382,7 +537,7 @@ namespace GOAP.Testing.UnitTests
                 builder.CreateAction("MineOre")
                     .WithStrategy(new NoOpStrategy())
                     .WithCost(_ => 1)
-                    //.WithCondition("PickaxeCrafted", true)
+                    .WithCondition("PickaxeCrafted", true)
                     .WithCondition("AtMine", true)
                     .WithEffect("OreCount", EffectDirection.Increase, 1)
                     .Build(),
@@ -412,14 +567,14 @@ namespace GOAP.Testing.UnitTests
                     .WithStrategy(new NoOpStrategy())
                     .WithCost(_ => 5)
                     .WithCondition("InEnd", true)
-                  //  .WithCondition("Stress", ConditionDirection.LessThanEq, 0.8f)
+                    .WithCondition("Stress", ConditionDirection.LessThanEq, 0.8f)
                     .WithEffect("DragonHealth", EffectDirection.Decrease, 15)
-                    //.WithEffect("Stress", EffectDirection.Increase, 0.34f)
+                    .WithEffect("Stress", EffectDirection.Increase, 0.34f)
                     .Build(),
                 builder.CreateAction("Destress")
                     .WithStrategy(new NoOpStrategy())
                     .WithCost(_ => 1)
-                    .WithCondition("Stress", ConditionDirection.GreaterThanEq, 0)
+                    .WithCondition("Stress", ConditionDirection.GreaterThanEq, 0f)
                     .WithEffect("Stress", EffectDirection.Decrease, 0.4f)
                     .Build()
                 );
@@ -434,8 +589,7 @@ namespace GOAP.Testing.UnitTests
         {
             IGoapPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
-            Dictionary<string, object> worldData = new Dictionary<string, object>();
-            worldData.Add("Health", 0);
+            Dictionary<string, object> worldData = new() { { "Health", 0 } };
 
             PlannerState worldState = new PlannerState(worldData);
             GoapGoal goal = new GoapGoal.Builder("HealGoal")
@@ -545,7 +699,7 @@ namespace GOAP.Testing.UnitTests
             PlannerState worldState = new PlannerState(worldData);
             GoapGoal goal = new GoapGoal.Builder("KillBoss")
                 .WithCondition("BossHealth", ConditionDirection.LessThanEq, 0)
-                .WithCondition("Health", ConditionDirection.GreaterThanEq, 15f)
+                .WithCondition("Health", ConditionDirection.GreaterThanEq, 30f)
                 .Build();
             
             HashSet<GoapAction> actions = TestUtils.AddAllActions(
@@ -772,6 +926,8 @@ namespace GOAP.Testing.UnitTests
             PlannerState worldState = new PlannerState(worldData);
             GoapGoal goal = new GoapGoal.Builder("WinGameGoal")
                 .WithCondition("MonsterKilled", true)
+                //.WithCondition("InLair", true)
+                //.WithCondition("IsHungry", false)
                 .Build();
             HashSet<GoapAction> actions = TestUtils.AddAllActions(
                 builder.CreateAction("KillMonster")

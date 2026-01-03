@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GOAP.Runtime.Agent
 {
-    public class WorldState : IWorldState
+    public class WorldState
     {
         private readonly Dictionary<string, Func<object>> data;
         
@@ -17,7 +17,7 @@ namespace GOAP.Runtime.Agent
         
         public T Get<T>(string key)
         {
-            if (!data.TryGetValue(key, out var value))
+            if (!this.data.TryGetValue(key, out var value))
                 return default;
 
             if (value is Func<T> fun) 
@@ -27,21 +27,16 @@ namespace GOAP.Runtime.Agent
             return default;
         }
 
-        public void Update<T>(string key, T value)
-        {
-            // noop
-        }
-
         public IWorldState Clone()
         {
-            return CreatePlannerState();
+            return this.CreatePlannerState();
         }
 
         public IWorldState CreatePlannerState()
         {
             Dictionary<string, object> calculatedSnapshot = new Dictionary<string, object>();
 
-            foreach (var pair in data)
+            foreach (var pair in this.data)
             {
                 calculatedSnapshot.Add(pair.Key, pair.Value());
             }

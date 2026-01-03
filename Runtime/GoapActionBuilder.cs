@@ -33,41 +33,34 @@ namespace GOAP.Runtime
     public class GoapActionBuilder : IGoapActionBuilder,
         IGoapActionStrategyBuilder, IGoapActionCostBuilder, IFinalGoapActionBuilder
     {
-        private string name;
-        private HashSet<GoapCondition> conditions;
-        private HashSet<GoapEffect> effects;
+        private string name = "";
+        private HashSet<GoapCondition> conditions = new();
+        private HashSet<GoapEffect> effects = new();
         private IActionStrategy actionStrategy;
         private Func<IWorldState, int> costFunc;
-        
-        public GoapActionBuilder()
-        {
-            name = "";
-            conditions = new HashSet<GoapCondition>();
-            effects = new HashSet<GoapEffect>();
-        }
-        
+
         public IGoapActionStrategyBuilder CreateAction(string actionName)
         {
-            name = actionName;
+            this.name = actionName;
             return this;
         }
 
         public IGoapActionCostBuilder WithStrategy(IActionStrategy strategy)
         {
-            actionStrategy = strategy;
+            this.actionStrategy = strategy;
             return this;
         }
 
         public IFinalGoapActionBuilder WithCost(Func<IWorldState, int> costFunction)
         {
-            costFunc = costFunction;
+            this.costFunc = costFunction;
             return this;
         }
 
 
         public IFinalGoapActionBuilder WithCondition(string key, bool value)
         {
-            return WithCondition(new GoapCondition
+            return this.WithCondition(new GoapCondition
             {
                 Key = key,
                 ConditionDirection = ConditionDirection.Equals,
@@ -78,7 +71,7 @@ namespace GOAP.Runtime
 
         public IFinalGoapActionBuilder WithCondition(string key, ConditionDirection direction, object value)
         {
-            return WithCondition(new GoapCondition
+            return this.WithCondition(new GoapCondition
             {
                 Key = key,
                 ConditionDirection = direction,
@@ -92,14 +85,14 @@ namespace GOAP.Runtime
         {
             if (!GoapUtils.VerifyCondition(condition))
                 throw new Exception("Incorrect format of condition!");
-            
-            conditions.Add(condition);
+
+            this.conditions.Add(condition);
             return this;
         }
 
         public IFinalGoapActionBuilder WithEffect(string key, bool value)
         {
-            effects.Add(new GoapEffect
+            this.effects.Add(new GoapEffect
             {
                 Key = key,
                 Value = value,
@@ -111,7 +104,7 @@ namespace GOAP.Runtime
 
         public IFinalGoapActionBuilder WithEffect(string key, EffectDirection direction, object value)
         {
-            return WithEffect(new GoapEffect
+            return this.WithEffect(new GoapEffect
             {
                 Key = key,
                 Value = value,
@@ -124,19 +117,19 @@ namespace GOAP.Runtime
         {
             if (!GoapUtils.VerifyEffect(effect))
                 throw new Exception("Incorrect format of condition!");
-            
-            effects.Add(effect);
+
+            this.effects.Add(effect);
             return this;
         }
 
         public GoapAction Build()
         {
-            GoapAction newAction = new GoapAction(name, actionStrategy, costFunc, conditions, effects);
-            name = "";
-            conditions = new HashSet<GoapCondition>();
-            effects = new HashSet<GoapEffect>();
-            actionStrategy = null;
-            costFunc = null;
+            GoapAction newAction = new GoapAction(this.name, this.actionStrategy, this.costFunc, this.conditions, this.effects);
+            this.name = "";
+            this.conditions = new HashSet<GoapCondition>();
+            this.effects = new HashSet<GoapEffect>();
+            this.actionStrategy = null;
+            this.costFunc = null;
             return newAction;
         }
     }

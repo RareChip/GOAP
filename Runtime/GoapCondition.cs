@@ -13,41 +13,41 @@ namespace GOAP.Runtime
 
         public GoapCondition(GoapDataType goapDataType, string key, object value, ConditionDirection conditionDirection)
         {
-            GoapDataType = goapDataType;
-            Key = key;
-            Value = value;
-            ConditionDirection = conditionDirection;
+            this.GoapDataType = goapDataType;
+            this.Key = key;
+            this.Value = value;
+            this.ConditionDirection = conditionDirection;
         }
 
         public bool Equals(GoapCondition other)
         {
-            if (GoapDataType != other.GoapDataType || Key != other.Key || ConditionDirection != other.ConditionDirection)
+            if (this.GoapDataType != other.GoapDataType || this.Key != other.Key || this.ConditionDirection != other.ConditionDirection)
                 return false;
 
-            switch (GoapDataType)
+            switch (this.GoapDataType)
             {
                 case GoapDataType.Bool:
                 case GoapDataType.Enum:
-                    return Equals(Value, other.Value);
+                    return Equals(this.Value, other.Value);
                 case GoapDataType.Int:
                     
-                    switch (ConditionDirection)
+                    switch (this.ConditionDirection)
                     {
                         case ConditionDirection.LessThanEq:
-                            return (int)Value >= (int)other.Value;
+                            return (int)this.Value >= (int)other.Value;
                         case ConditionDirection.GreaterThanEq:
-                            return (int)Value <= (int)other.Value;
+                            return (int)this.Value <= (int)other.Value;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                 case GoapDataType.Float:
                     
-                    switch (ConditionDirection)
+                    switch (this.ConditionDirection)
                     {
                         case ConditionDirection.LessThanEq:
-                            return (float)Value >= (float)other.Value;
+                            return (float)this.Value >= (float)other.Value;
                         case ConditionDirection.GreaterThanEq:
-                            return (float)Value <= (float)other.Value;
+                            return (float)this.Value <= (float)other.Value;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
@@ -58,18 +58,18 @@ namespace GOAP.Runtime
 
         public override int GetHashCode()
         {
-            return HashCode.Combine((int)GoapDataType, Key, Value, (int)ConditionDirection);
+            return HashCode.Combine((int)this.GoapDataType, this.Key, this.Value, (int)this.ConditionDirection);
         }
         
         public int GetHashCode(IWorldState worldState)
         {
-            if (GoapResolver.ConditionIsSatisfied(this, worldState))
+            if (worldState.ConditionIsSatisfied(this))
             {
-                return HashCode.Combine((int)GoapDataType, Key, 
-                    (int)ConditionDirection, true);
+                return HashCode.Combine((int)this.GoapDataType, this.Key, 
+                    (int)this.ConditionDirection, true);
             }
 
-            return GetHashCode();
+            return this.GetHashCode();
         }
     }
     

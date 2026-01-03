@@ -10,7 +10,7 @@ namespace GOAP.Runtime.Agent
 
         public WorldStateBuilder AddData(string key, Func<object> val)
         {
-            if(!data.TryAdd(key,val))
+            if(!this.data.TryAdd(key,val))
             {
                 Debug.LogError("Key [" + key + "] is already in WorldState data.");
             }
@@ -20,7 +20,7 @@ namespace GOAP.Runtime.Agent
 
         public WorldState Build()
         {
-            return new WorldState(data);
+            return new WorldState(this.data);
         }
     }
 }

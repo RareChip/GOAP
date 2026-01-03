@@ -17,28 +17,28 @@ namespace GOAP.Runtime
         public GoapAction(string actionName, IActionStrategy actionStrategy, Func<IWorldState, int> costFunc, 
             HashSet<GoapCondition> conditions, HashSet<GoapEffect> effects)
         {
-            ActionName = actionName;
+            this.ActionName = actionName;
             this.actionStrategy = actionStrategy;
-            CalculateCost = costFunc;
-            Conditions = conditions;
-            Effects = effects;
+            this.CalculateCost = costFunc;
+            this.Conditions = conditions;
+            this.Effects = effects;
 
-            ConditionMap = new Dictionary<string, GoapCondition>();
+            this.ConditionMap = new Dictionary<string, GoapCondition>();
             foreach (GoapCondition goapCondition in conditions)
             {
-                ConditionMap.Add(goapCondition.Key, goapCondition);
+                this.ConditionMap.Add(goapCondition.Key, goapCondition);
             }
 
-            EffectMap = new Dictionary<string, GoapEffect>();
+            this.EffectMap = new Dictionary<string, GoapEffect>();
             foreach (GoapEffect goapEffect in effects)
             {
-                EffectMap.Add(goapEffect.Key, goapEffect);
+                this.EffectMap.Add(goapEffect.Key, goapEffect);
             }
         }
         
-        public void StartAction() => actionStrategy.Start();
-        public void ExecuteAction() => actionStrategy.Execute();
-        public void StopAction() => actionStrategy.Stop();
+        public void StartAction() => this.actionStrategy.Start();
+        public void ExecuteAction() => this.actionStrategy.Execute();
+        public void StopAction() => this.actionStrategy.Stop();
         
     }
 }

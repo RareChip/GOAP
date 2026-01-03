@@ -4,9 +4,9 @@ using GOAP.Runtime.Internal;
 
 namespace GOAP.Testing.HelperClasses
 {
-    public class TestPlannerNode : PlannerNode
+    public class TestRegressiveNode : RegressiveNode
     {
-        public TestPlannerNode(HashSet<GoapCondition> conditions) : base(conditions, null, 1, null)
+        public TestRegressiveNode(HashSet<GoapCondition> conditions) : base(conditions, null, 1, null)
         {
         }
     }

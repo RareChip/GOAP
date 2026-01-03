@@ -8,12 +8,13 @@ namespace GOAP.Runtime.Internal
         public ForwardNode ParentNode { get; }
         public int Cost { get; }
         public GoapAction Action { get; }
+
         public ForwardNode(IWorldState worldState, ForwardNode parentNode, int cost, GoapAction action)
         {
-            WorldState = worldState;
-            ParentNode = parentNode;
-            Cost = cost;
-            Action = action;
+            this.WorldState = worldState;
+            this.ParentNode = parentNode;
+            this.Cost = cost;
+            this.Action = action;
         }
 
         public override bool Equals(object obj)
@@ -21,12 +22,12 @@ namespace GOAP.Runtime.Internal
             if (obj is not ForwardNode other)
                 return false;
 
-            return WorldState.Equals(other.WorldState);
+            return this.WorldState.Equals(other.WorldState);
         }
 
         public override int GetHashCode()
         {
-            return WorldState.GetHashCode();
+            return this.WorldState.GetHashCode();
         }
     }
 }

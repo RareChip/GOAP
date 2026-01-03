@@ -12,12 +12,12 @@ namespace GOAP.Runtime
 
         public bool Equals(GoapEffect other)
         {
-            return GoapDataType == other.GoapDataType && Key == other.Key && Equals(Value, other.Value) && EffectDirection == other.EffectDirection;
+            return this.GoapDataType == other.GoapDataType && this.Key == other.Key && Equals(this.Value, other.Value) && this.EffectDirection == other.EffectDirection;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine((int)GoapDataType, Key, Value, (int)EffectDirection);
+            return HashCode.Combine((int)this.GoapDataType, this.Key, this.Value, (int)this.EffectDirection);
         }
     }
 

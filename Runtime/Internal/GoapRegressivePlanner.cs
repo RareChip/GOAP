@@ -6,11 +6,11 @@ using UnityEngine;
 
 namespace GOAP.Runtime.Internal
 {
-    public class GoapPlanner : IGoapPlanner
+    public class GoapRegressivePlanner : IGoapPlanner
     {
         // This is interesting. We can implement an interface here for a planning strategy for goals. The default
         // implementation will use Utility AI
-        public GoapGoal GenerateBestGoal(HashSet<GoapGoal> goals)
+        public GoapGoal GenerateBestGoal(HashSet<GoapGoal> goals, IWorldState worldState)
         {
 
             return null;
@@ -23,10 +23,10 @@ namespace GOAP.Runtime.Internal
                 return null;
             }
 
-            PriorityQueue<PlannerNode, int> priorityQueue = new PriorityQueue<PlannerNode, int>();
-            HashSet<PlannerNode> visitedNodes = new HashSet<PlannerNode>();
+            PriorityQueue<RegressiveNode, int> priorityQueue = new PriorityQueue<RegressiveNode, int>();
+            HashSet<RegressiveNode> visitedNodes = new HashSet<RegressiveNode>();
             
-            PlannerNode startingNode = new PlannerNode(
+            RegressiveNode startingNode = new RegressiveNode(
                 new HashSet<GoapCondition>(goal.Conditions),
                 null,
                 0,
@@ -35,7 +35,7 @@ namespace GOAP.Runtime.Internal
 
             while (priorityQueue.Count > 0)
             {
-                PlannerNode current = priorityQueue.Dequeue();
+                RegressiveNode current = priorityQueue.Dequeue();
 
 
                 if (visitedNodes.Contains(current) ||
@@ -47,8 +47,7 @@ namespace GOAP.Runtime.Internal
                 visitedNodes.Add(current);
 
 
-                bool allConditionsSatisfied =
-                    current.Conditions.All(x => GoapResolver.ConditionIsSatisfied(x, worldState));
+                bool allConditionsSatisfied = current.Conditions.All(worldState.ConditionIsSatisfied);
                 if (allConditionsSatisfied)
                 {
                     // We found a plan!
@@ -60,7 +59,7 @@ namespace GOAP.Runtime.Internal
                         current = current.ParentNode;
                     }
 
-                    return new ActionPlan(goal, path, totalCost);
+                    return new ActionPlan(goal, new Stack<GoapAction>(path.Reverse()), totalCost);
                 }
 
                 foreach (GoapAction action in actions)
@@ -81,14 +80,14 @@ namespace GOAP.Runtime.Internal
                     }
 
                     int heuristic = newConditions.Sum(x =>
-                        GoapResolver.ConditionIsSatisfied(x, worldState) ? 0 : CalculateHeuristic(worldState, x)
+                        worldState.ConditionIsSatisfied(x) ? 0 : CalculateHeuristic(worldState, x)
                     );
 
                     int nodeCost = action.CalculateCost(worldState) + current.Cost;
                     int priority = nodeCost + heuristic;
 
 
-                    PlannerNode newNode = new PlannerNode(newConditions, current, nodeCost, action);
+                    RegressiveNode newNode = new RegressiveNode(newConditions, current, nodeCost, action);
                     priorityQueue.Enqueue(newNode, priority);
                 }
             }

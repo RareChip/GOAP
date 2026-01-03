@@ -31,14 +31,14 @@ namespace GOAP.Testing
                 GoapAction current = planCopy.Dequeue();
                 foreach (GoapCondition currentCondition in current.Conditions)
                 {
-                    Assert.IsTrue(GoapResolver.ConditionIsSatisfied(currentCondition, worldState));
+                    Assert.IsTrue(worldState.ConditionIsSatisfied(currentCondition));
                 }
                 GoapUtils.ApplyEffectsToPlannerState(current.Effects, worldState);
             }
 
             foreach (GoapCondition currentCondition in goal.Conditions)
             {
-                Assert.IsTrue(GoapResolver.ConditionIsSatisfied(currentCondition, worldState));
+                Assert.IsTrue(worldState.ConditionIsSatisfied(currentCondition));
             }
         }
     }
