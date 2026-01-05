@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GOAP.Runtime.Internal
+namespace GOAP.Runtime.Core
 {
     public class ActionPlan
     {

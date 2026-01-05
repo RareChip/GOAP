@@ -1,13 +1,15 @@
-using System.Collections.Generic;
+using GOAP.Runtime.API;
+using GOAP.Runtime.Core;
 
 namespace GOAP.Runtime.Internal
 {
     public class ForwardNode
     {
-        public IWorldState WorldState { get; }
-        public ForwardNode ParentNode { get; }
-        public int Cost { get; }
-        public GoapAction Action { get; }
+        public IWorldState WorldState { get; private set; }
+        public ForwardNode ParentNode { get; private set; }
+        public int Cost { get; private set; }
+        public GoapAction Action { get; private set; }
+        public int CurrentPlanLength { get; private set; }
 
         public ForwardNode(IWorldState worldState, ForwardNode parentNode, int cost, GoapAction action)
         {
@@ -15,19 +17,7 @@ namespace GOAP.Runtime.Internal
             this.ParentNode = parentNode;
             this.Cost = cost;
             this.Action = action;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is not ForwardNode other)
-                return false;
-
-            return this.WorldState.Equals(other.WorldState);
-        }
-
-        public override int GetHashCode()
-        {
-            return this.WorldState.GetHashCode();
+            this.CurrentPlanLength = parentNode == null ? 0 : parentNode.CurrentPlanLength + 1;
         }
     }
 }

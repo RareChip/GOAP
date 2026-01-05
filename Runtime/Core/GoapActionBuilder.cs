@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using GOAP.Runtime.Internal;
+using GOAP.Runtime.API;
 using GOAP.Runtime.Util;
 
-namespace GOAP.Runtime
+namespace GOAP.Runtime.Core
 {
     public interface IGoapActionBuilder
     {
@@ -60,24 +60,12 @@ namespace GOAP.Runtime
 
         public IFinalGoapActionBuilder WithCondition(string key, bool value)
         {
-            return this.WithCondition(new GoapCondition
-            {
-                Key = key,
-                ConditionDirection = ConditionDirection.Equals,
-                Value = value,
-                GoapDataType = GoapDataType.Bool
-            });
+            return this.WithCondition(new GoapCondition(GoapDataType.Bool, key, value, ConditionDirection.Equals));
         }
 
         public IFinalGoapActionBuilder WithCondition(string key, ConditionDirection direction, object value)
         {
-            return this.WithCondition(new GoapCondition
-            {
-                Key = key,
-                ConditionDirection = direction,
-                Value = value,
-                GoapDataType = GoapUtils.GetGoapDataType(value)
-            });
+            return this.WithCondition(new GoapCondition(GoapUtils.GetGoapDataType(value), key, value, direction));
         }
         
 

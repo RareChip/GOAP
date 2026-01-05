@@ -1,27 +1,18 @@
 using System.Collections.Generic;
 using GOAP.Runtime;
+using GOAP.Runtime.API;
+using GOAP.Runtime.Core;
 using GOAP.Runtime.Internal;
-using GOAP.Runtime.Util;
-using GOAP.Testing.ActionStrategies;
 using NUnit.Framework;
 
-namespace GOAP.Testing
+namespace GOAP.Tests
 {
     public static class TestUtils
     {
+        private const int MAX_PLAN_LENGTH = 20;
         public static IGoapPlanner GetPlanner()
         {
-            return new GoapForwardPlanner();
-        }
-        public static HashSet<GoapAction> AddAllActions(params GoapAction[] actions)
-        {
-            HashSet<GoapAction> actionsSet = new HashSet<GoapAction>();
-            foreach (GoapAction goapAction in actions)
-            {
-                actionsSet.Add(goapAction);
-            }
-
-            return actionsSet;
+            return new GoapForwardPlanner(MAX_PLAN_LENGTH);
         }
         public static void AssertPlanMakesSense(ActionPlan plan, PlannerState worldState, GoapGoal goal)
         {
@@ -33,7 +24,11 @@ namespace GOAP.Testing
                 {
                     Assert.IsTrue(worldState.ConditionIsSatisfied(currentCondition));
                 }
-                GoapUtils.ApplyEffectsToPlannerState(current.Effects, worldState);
+
+                foreach (GoapEffect effect in current.Effects)
+                {
+                    worldState.ApplyEffect(effect);
+                }
             }
 
             foreach (GoapCondition currentCondition in goal.Conditions)

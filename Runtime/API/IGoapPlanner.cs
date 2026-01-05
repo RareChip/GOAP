@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using GOAP.Runtime.Internal;
+using GOAP.Runtime.Core;
 
-namespace GOAP.Runtime
+namespace GOAP.Runtime.API
 {
     public interface IGoapPlanner
     {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GOAP.Runtime.Agent
+namespace GOAP.Runtime.Unity
 {
     public class WorldStateBuilder
     {

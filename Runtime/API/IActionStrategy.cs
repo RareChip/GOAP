@@ -1,4 +1,4 @@
-namespace GOAP.Runtime
+namespace GOAP.Runtime.API
 {
     public interface IActionStrategy
     {

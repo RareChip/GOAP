@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using GOAP.Runtime.Core;
 
-namespace GOAP.Runtime.Agent
+namespace GOAP.Runtime.Unity
 {
     public abstract class GoapAgentConfiguration
     {

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using GOAP.Runtime.API;
 using GOAP.Runtime.Internal;
 using UnityEngine;
 
-namespace GOAP.Runtime.Agent
+namespace GOAP.Runtime.Unity
 {
     public class WorldState
     {
