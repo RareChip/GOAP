@@ -9,30 +9,40 @@ namespace GOAP.Runtime.Unity
     public class WorldState
     {
         private readonly Dictionary<string, Func<object>> data;
-        
+        private readonly Dictionary<string, Func<object>> staticData;
+
+        public WorldState()
+        {
+            data = new Dictionary<string, Func<object>>();
+        }
         public WorldState(Dictionary<string, Func<object>> data)
         {
             this.data = data;
         }
         
-        public T Get<T>(string key)
+        public WorldState(Dictionary<string, object> data)
         {
-            if (!this.data.TryGetValue(key, out var value))
-                return default;
-
-            if (value is Func<T> fun) 
-                return fun();
-
-            Debug.LogError("Value of Key [" + key + "] is not of type [" + typeof(T) + "].");
-            return default;
+            this.data = new Dictionary<string, Func<object>>();
+            foreach (KeyValuePair<string, object> pair in data)
+            {
+                this.data.Add(pair.Key, () => pair.Value);
+            }
         }
 
-        public IWorldState Clone()
+        public void AddConditionData(string key, Func<object> getData)
         {
-            return this.CreatePlannerState();
+            if (getData() is not int or float or bool)
+            {
+                Debug.LogError("Only ints, float, bool, and enum types are supported in WorldState!");
+                return;
+            }
+            if (!data.TryAdd(key, getData))
+            {
+                Debug.LogError($"Key {key} already exists in WorldState!");
+            }
         }
-
-        public IWorldState CreatePlannerState()
+        
+        public IWorldState CreateSnapshot()
         {
             Dictionary<string, object> calculatedSnapshot = new Dictionary<string, object>();
 

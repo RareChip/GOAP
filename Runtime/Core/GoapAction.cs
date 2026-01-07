@@ -22,7 +22,8 @@ namespace GOAP.Runtime.Core
             this.Conditions = conditions;
             this.Effects = effects;
         }
-        
+
+        public bool IsComplete => this.actionStrategy.IsComplete;
         public void StartAction() => this.actionStrategy.Start();
         public void ExecuteAction() => this.actionStrategy.Execute();
         public void StopAction() => this.actionStrategy.Stop();

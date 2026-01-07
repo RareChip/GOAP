@@ -16,7 +16,7 @@ namespace GOAP.Tests
         {
             IGoapPlanner planner = TestUtils.GetPlanner();
 
-            ActionPlan plan = planner.GeneratePlan(null, null, null);
+            IActionPlan plan = planner.GeneratePlan(null, null, null);
             Assert.Null(plan);
 
             plan = planner.GeneratePlan(new HashSet<GoapAction>(), null, null);
@@ -47,19 +47,13 @@ namespace GOAP.Tests
             actions.Add(builder.CreateAction("BuildWall")
                 .WithStrategy(null)
                 .WithCost(_ => 1)
-                .WithEffect(new GoapEffect
-                {
-                    Key = "WallsBuilt",
-                    EffectDirection = EffectDirection.Increase,
-                    Value = 1,
-                    GoapDataType = GoapDataType.Int
-                })
+                .WithEffect("WallsBuilt", EffectDirection.Increase, 1)
                 .Build());
 
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             Assert.AreEqual(3, plan.TotalCost);
-            Assert.AreEqual(3, plan.Actions.Count);
+            Assert.AreEqual(3, plan.Actions.Length);
             Assert.AreEqual("BuildWallsGoal", plan.Goal.GoalName);
             foreach (GoapAction action in plan.Actions)
             {
@@ -96,10 +90,10 @@ namespace GOAP.Tests
                 .WithEffect("Prepared",true)
                 .Build());
 
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             Assert.AreEqual(4, plan.TotalCost);
-            Assert.AreEqual(4, plan.Actions.Count);
+            Assert.AreEqual(4, plan.Actions.Length);
             Assert.AreEqual("BuildWallsGoal", plan.Goal.GoalName);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
         }
@@ -163,10 +157,10 @@ namespace GOAP.Tests
                 .WithEffect("HasAxe", false)
                 .Build());
 
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
-            Assert.AreEqual(14, plan.Actions.Count);
+            Assert.AreEqual(14, plan.Actions.Length);
             Assert.AreEqual(15, plan.TotalCost);
             Assert.AreEqual("BuildWallsGoal", plan.Goal.GoalName);
 
@@ -278,10 +272,10 @@ namespace GOAP.Tests
                     .Build()
                 );
             
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
-            Assert.AreEqual(14, plan.Actions.Count);
+            Assert.AreEqual(14, plan.Actions.Length);
             Assert.AreEqual(35, plan.TotalCost);
             Assert.AreEqual("CraftPickaxeGoal", plan.Goal.GoalName);
 
@@ -442,7 +436,7 @@ namespace GOAP.Tests
                     .Build()
                 );
 
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.Null(plan);
         }
         
@@ -593,7 +587,7 @@ namespace GOAP.Tests
                     .Build()
                 );
 
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
         }
@@ -621,11 +615,11 @@ namespace GOAP.Tests
                     .WithEffect("Health", EffectDirection.Increase, 33)
                     .Build());
             
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
             Assert.AreEqual(91, plan.TotalCost);
-            Assert.AreEqual(4, plan.Actions.Count);
+            Assert.AreEqual(4, plan.Actions.Length);
             Assert.AreEqual("HealGoal", plan.Goal.GoalName);
 
             Assert.AreEqual(100,worldState.GetInt("Health"));
@@ -655,11 +649,11 @@ namespace GOAP.Tests
                     .WithEffect("EnemyHealth", EffectDirection.Decrease, 25)
                     .Build());
             
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
             Assert.AreEqual(40, plan.TotalCost);
-            Assert.AreEqual(4, plan.Actions.Count);
+            Assert.AreEqual(4, plan.Actions.Length);
             Assert.AreEqual("KillEnemy", plan.Goal.GoalName);
 
             Assert.AreEqual(0,worldState.GetInt("EnemyHealth"));
@@ -694,10 +688,10 @@ namespace GOAP.Tests
                     .WithEffect("Money", EffectDirection.Increase, 5)
                     .Build());
             
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
-            Assert.AreEqual(4, plan.Actions.Count);
+            Assert.AreEqual(4, plan.Actions.Length);
             Assert.AreEqual(4, plan.TotalCost);
         }
 
@@ -740,10 +734,10 @@ namespace GOAP.Tests
                     .Build()
                 );
             
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
-            Assert.AreEqual(4, plan.Actions.Count);
+            Assert.AreEqual(4, plan.Actions.Length);
             Assert.AreEqual(31, plan.TotalCost);
         }
 
@@ -769,7 +763,7 @@ namespace GOAP.Tests
                     .WithEffect("BeastHealth", EffectDirection.Decrease, 100)
                     .Build()
             );
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.Null(plan);
         }
         
@@ -804,7 +798,7 @@ namespace GOAP.Tests
                     .Build()
             );
             
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.Null(plan);
         }
 
@@ -845,11 +839,11 @@ namespace GOAP.Tests
                     .WithEffect("IceCreamForSale", true)
                     .Build()
             );
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
             Assert.AreEqual(48,plan.TotalCost);
-            Assert.AreEqual(8,plan.Actions.Count);
+            Assert.AreEqual(8,plan.Actions.Length);
         }
 
         [Test]
@@ -901,11 +895,11 @@ namespace GOAP.Tests
                     .Build()
             );
             
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
             Assert.AreEqual(47,plan.TotalCost);
-            Assert.AreEqual(6,plan.Actions.Count);
+            Assert.AreEqual(6,plan.Actions.Length);
         }
 
         [Test]
@@ -1103,7 +1097,7 @@ namespace GOAP.Tests
                     .Build()
                 );
 
-            ActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
+            IActionPlan plan = planner.GeneratePlan(actions, goal, worldState);
             Assert.NotNull(plan);
             TestUtils.AssertPlanMakesSense(plan, worldState, goal);
         }

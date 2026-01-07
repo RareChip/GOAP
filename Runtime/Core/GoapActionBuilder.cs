@@ -80,25 +80,13 @@ namespace GOAP.Runtime.Core
 
         public IFinalGoapActionBuilder WithEffect(string key, bool value)
         {
-            this.effects.Add(new GoapEffect
-            {
-                Key = key,
-                Value = value,
-                GoapDataType = GoapDataType.Bool,
-                EffectDirection = EffectDirection.Set
-            });
+            this.effects.Add(new GoapEffect(GoapDataType.Bool, key, value, EffectDirection.Set));
             return this;
         }
 
         public IFinalGoapActionBuilder WithEffect(string key, EffectDirection direction, object value)
         {
-            return this.WithEffect(new GoapEffect
-            {
-                Key = key,
-                Value = value,
-                GoapDataType = GoapUtils.GetGoapDataType(value),
-                EffectDirection = direction
-            });
+            return this.WithEffect(new GoapEffect(GoapUtils.GetGoapDataType(value), key, value, direction));
         }
 
         public IFinalGoapActionBuilder WithEffect(GoapEffect effect)

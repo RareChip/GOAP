@@ -10,6 +10,7 @@ namespace GOAP.Runtime.Internal
     public class GoapForwardPlanner : IGoapPlanner
     {
         private readonly int maxPlanLength;
+
         public GoapForwardPlanner(int maxPlanLength)
         {
             this.maxPlanLength = maxPlanLength;
@@ -21,11 +22,10 @@ namespace GOAP.Runtime.Internal
             return bestGoal;
         }
 
-        public ActionPlan GeneratePlan(HashSet<GoapAction> actions, GoapGoal goal, IWorldState worldState)
+        public IActionPlan GeneratePlan(HashSet<GoapAction> actions, GoapGoal goal, IWorldState worldState)
         {
             if (actions is null || goal is null || worldState is null)
                 return null;
-
             HashSet<IWorldState> visitedStates = new();
             PriorityQueue<ForwardNode, int> priorityQueue = new();
 
@@ -35,7 +35,7 @@ namespace GOAP.Runtime.Internal
             while (priorityQueue.Count > 0)
             {
                 ForwardNode current = priorityQueue.Dequeue();
-                
+
                 if (!visitedStates.Add(current.WorldState))
                 {
                     continue;
@@ -44,34 +44,34 @@ namespace GOAP.Runtime.Internal
                 bool allSatisfied = true;
                 foreach (GoapCondition condition in goal.Conditions)
                 {
-                    if (current.WorldState.ConditionIsSatisfied(condition)) 
+                    if (current.WorldState.ConditionIsSatisfied(condition))
                         continue;
                     allSatisfied = false;
                     break;
                 }
-                
-                if(allSatisfied)
+
+                if (allSatisfied)
                 {
-                    Stack<GoapAction> path = new();
+                    Stack<ForwardNode> path = new();
                     int totalCost = current.Cost;
                     while (current.ParentNode != null)
                     {
-                        path.Push(current.Action);
+                        path.Push(current);
                         current = current.ParentNode;
                     }
 
-                    return new ActionPlan(goal, path, totalCost);
+                    return new ForwardActionPlan(goal, path, totalCost);
                 }
 
-                if(current.CurrentPlanLength > this.maxPlanLength)
+                if (current.CurrentPlanLength > this.maxPlanLength)
                     continue;
-                
+
                 foreach (GoapAction action in actions)
                 {
                     allSatisfied = true;
                     foreach (GoapCondition condition in action.Conditions)
                     {
-                        if (current.WorldState.ConditionIsSatisfied(condition)) 
+                        if (current.WorldState.ConditionIsSatisfied(condition))
                             continue;
                         allSatisfied = false;
                         break;
@@ -90,7 +90,7 @@ namespace GOAP.Runtime.Internal
                     int cost = current.Cost + action.CalculateCost(worldState);
 
                     int heuristic = 0;
-                    
+
                     foreach (GoapCondition condition in goal.Conditions)
                     {
                         heuristic += CalculateHeuristic(condition, newState);
@@ -103,11 +103,12 @@ namespace GOAP.Runtime.Internal
 
             return null;
         }
+
         private static int CalculateHeuristic(GoapCondition condition, IWorldState newState)
         {
             if (newState.ConditionIsSatisfied(condition))
                 return 0;
-        
+
             return condition.GoapDataType switch
             {
                 GoapDataType.Bool => 3,

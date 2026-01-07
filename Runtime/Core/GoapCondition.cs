@@ -1,13 +1,14 @@
+using System;
 using GOAP.Runtime.Util;
 
 namespace GOAP.Runtime.Core
 {
     public class GoapCondition
     {
-        public GoapDataType GoapDataType { get; private set; }
-        public string Key { get; private set; }
-        public object Value { get; private set; }
-        public ConditionDirection ConditionDirection { get; private set; }
+        public GoapDataType GoapDataType { get; }
+        public string Key { get; }
+        public object Value { get; }
+        public ConditionDirection ConditionDirection { get; }
 
         public GoapCondition(GoapDataType goapDataType, string key, object value, ConditionDirection conditionDirection)
         {
@@ -15,6 +16,20 @@ namespace GOAP.Runtime.Core
             this.Key = key;
             this.Value = value;
             this.ConditionDirection = conditionDirection;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not GoapCondition other)
+                return false;
+
+            return GoapDataType == other.GoapDataType
+                   && Key == other.Key && Value.Equals(other.Value) && ConditionDirection == other.ConditionDirection;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(GoapDataType, Key, Value, ConditionDirection);
         }
     }
     

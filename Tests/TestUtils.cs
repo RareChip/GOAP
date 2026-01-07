@@ -14,7 +14,7 @@ namespace GOAP.Tests
         {
             return new GoapForwardPlanner(MAX_PLAN_LENGTH);
         }
-        public static void AssertPlanMakesSense(ActionPlan plan, PlannerState worldState, GoapGoal goal)
+        public static void AssertPlanMakesSense(IActionPlan plan, PlannerState worldState, GoapGoal goal)
         {
             Queue<GoapAction> planCopy = new Queue<GoapAction>(plan.Actions);
             while (planCopy.Count > 0)
