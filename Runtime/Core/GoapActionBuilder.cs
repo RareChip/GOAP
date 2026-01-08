@@ -17,8 +17,9 @@ namespace GOAP.Runtime.Core
 
     public interface IGoapActionCostBuilder
     {
-        IFinalGoapActionBuilder WithCost(Func<IWorldState,int> costFunc);
+        IFinalGoapActionBuilder WithCost(Func<IWorldState, int> costFunc);
     }
+
     public interface IFinalGoapActionBuilder
     {
         IFinalGoapActionBuilder WithCondition(string key, bool value);
@@ -29,7 +30,7 @@ namespace GOAP.Runtime.Core
         IFinalGoapActionBuilder WithEffect(GoapEffect effect);
         GoapAction Build();
     }
-    
+
     public class GoapActionBuilder : IGoapActionBuilder,
         IGoapActionStrategyBuilder, IGoapActionCostBuilder, IFinalGoapActionBuilder
     {
@@ -57,7 +58,6 @@ namespace GOAP.Runtime.Core
             return this;
         }
 
-
         public IFinalGoapActionBuilder WithCondition(string key, bool value)
         {
             return this.WithCondition(new GoapCondition(GoapDataType.Bool, key, value, ConditionDirection.Equals));
@@ -67,7 +67,7 @@ namespace GOAP.Runtime.Core
         {
             return this.WithCondition(new GoapCondition(GoapUtils.GetGoapDataType(value), key, value, direction));
         }
-        
+
 
         public IFinalGoapActionBuilder WithCondition(GoapCondition condition)
         {
@@ -100,7 +100,8 @@ namespace GOAP.Runtime.Core
 
         public GoapAction Build()
         {
-            GoapAction newAction = new GoapAction(this.name, this.actionStrategy, this.costFunc, this.conditions, this.effects);
+            GoapAction newAction = new GoapAction(this.name, this.actionStrategy, this.costFunc, this.conditions,
+                this.effects);
             this.name = "";
             this.conditions = new HashSet<GoapCondition>();
             this.effects = new HashSet<GoapEffect>();

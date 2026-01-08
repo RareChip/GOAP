@@ -16,13 +16,13 @@ namespace GOAP.Runtime.Internal
             this.maxPlanLength = maxPlanLength;
         }
 
-        public GoapGoal GenerateBestGoal(HashSet<GoapGoal> goals, IWorldState worldState)
+        public GoapGoal GenerateBestGoal(ISet<GoapGoal> goals, IWorldState worldState)
         {
             GoapGoal bestGoal = goals.OrderByDescending(x => x.CalculateInsistence).First();
             return bestGoal;
         }
 
-        public IActionPlan GeneratePlan(HashSet<GoapAction> actions, GoapGoal goal, IWorldState worldState)
+        public IActionPlan GeneratePlan(ISet<GoapAction> actions, GoapGoal goal, IWorldState worldState)
         {
             if (actions is null || goal is null || worldState is null)
                 return null;
@@ -52,15 +52,15 @@ namespace GOAP.Runtime.Internal
 
                 if (allSatisfied)
                 {
-                    Stack<ForwardNode> path = new();
+                    Stack<GoapAction> path = new();
                     int totalCost = current.Cost;
                     while (current.ParentNode != null)
                     {
-                        path.Push(current);
+                        path.Push(current.Action);
                         current = current.ParentNode;
                     }
 
-                    return new ForwardActionPlan(goal, path, totalCost);
+                    return new ForwardActionPlan(goal, path, totalCost, worldState);
                 }
 
                 if (current.CurrentPlanLength > this.maxPlanLength)

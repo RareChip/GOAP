@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using GOAP.Runtime.API;
 using GOAP.Runtime.Core;
-using GOAP.Runtime.Internal;
 using UnityEngine;
 
 namespace GOAP.Runtime.Unity
@@ -12,11 +8,11 @@ namespace GOAP.Runtime.Unity
     public class GoapAgent : MonoBehaviour
     {
         [SerializeField] private GoapAgentConfiguration goapConfiguration;
-        [SerializeField] private int maxPlanLength = 20;
         [SerializeField] private float planningInterval = 0.5f;
+        [Header("Debugging"), SerializeField] private bool printPlan;
 
-        private HashSet<GoapAction> actions;
-        private HashSet<GoapGoal> goals;
+        private ISet<GoapAction> actions;
+        private ISet<GoapGoal> goals;
         private WorldState worldState;
         private MultithreadedPlanner planner;
         private GoapAction currentAction;
@@ -25,11 +21,11 @@ namespace GOAP.Runtime.Unity
 
         private void Awake()
         {
-            this.worldState = this.goapConfiguration.CreateWorldState();
-            this.actions = this.goapConfiguration.CreateActions(new GoapActionBuilder());
-            this.goals = this.goapConfiguration.CreateGoals();
-            this.planner = new MultithreadedPlanner(new GoapForwardPlanner(maxPlanLength), actions, goals);
-            this.currentTime = 0;
+            worldState = goapConfiguration.CreateWorldState();
+            actions = goapConfiguration.CreateActions(new GoapActionBuilder());
+            goals = goapConfiguration.CreateGoals(new GoapGoalBuilder());
+            planner = new MultithreadedPlanner(goapConfiguration.CreatePlanner(), actions, goals);
+            currentTime = 0;
         }
 
         private void Update()
@@ -52,7 +48,7 @@ namespace GOAP.Runtime.Unity
                     currentAction = currentPlan.PopAction();
                     currentAction?.StartAction();
                 }
-                
+
                 currentAction?.ExecuteAction();
             }
 
@@ -60,14 +56,17 @@ namespace GOAP.Runtime.Unity
                 return;
 
             bool shouldUseNewPlan =
-                currentPlan == null || !currentPlan.Goal.Equals(newPlan.Goal) || currentPlan.IsComplete ||
-                newPlan.TotalCost < currentPlan.TotalCost;
+                currentPlan == null
+                || !currentPlan.Goal.Equals(newPlan.Goal)
+                || (currentPlan.IsComplete && currentAction == null)
+                || newPlan.TotalCost < currentPlan.TotalCost;
 
-            if (!shouldUseNewPlan) 
+            if (!shouldUseNewPlan)
                 return;
-            
             currentPlan = newPlan;
-            PrintActionPlan();
+
+            if (printPlan)
+                PrintActionPlan();
         }
 
         private void RequestNewPlan()
@@ -88,6 +87,13 @@ namespace GOAP.Runtime.Unity
         private void PrintActionPlan()
         {
             string printString = "";
+
+            if (currentPlan == null)
+            {
+                print($"No plan could be found!");
+                return;
+            }
+            
             printString += $"Goal: [{currentPlan.Goal.GoalName}]\n";
             printString += "Cost: " + currentPlan.TotalCost + "\n";
             printString += "Actions: ";

@@ -9,7 +9,6 @@ namespace GOAP.Runtime.Unity
     public class WorldState
     {
         private readonly Dictionary<string, Func<object>> data;
-        private readonly Dictionary<string, Func<object>> staticData;
 
         public WorldState()
         {

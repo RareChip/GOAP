@@ -1,21 +1,17 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GOAP.Runtime.API;
 using GOAP.Runtime.Core;
-using GOAP.Runtime.Internal;
-using Unity.Collections;
-using Unity.Jobs;
 
 namespace GOAP.Runtime.Unity
 {
     public class MultithreadedPlanner
     {
         private readonly IGoapPlanner planner;
-        private readonly HashSet<GoapAction> actions;
-        private readonly HashSet<GoapGoal> goals;
+        private readonly ISet<GoapAction> actions;
+        private readonly ISet<GoapGoal> goals;
         private Task<IActionPlan> planTask;
-        public MultithreadedPlanner(IGoapPlanner planner, HashSet<GoapAction> actions, HashSet<GoapGoal> goals)
+        public MultithreadedPlanner(IGoapPlanner planner, ISet<GoapAction> actions, ISet<GoapGoal> goals)
         {
             this.planner = planner;
             this.actions = actions;

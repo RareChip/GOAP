@@ -10,28 +10,24 @@ namespace GOAP.Runtime.Internal
         public GoapAction[] Actions { get; }
         public int TotalCost { get; private set; }
         public bool IsComplete => TotalCost <= 0;
-        private readonly Stack<ForwardNode> nodes;
+        private readonly Stack<GoapAction> actionStack;
+        private IWorldState worldState;
         
-        public ForwardActionPlan(GoapGoal goal, Stack<ForwardNode> nodes, int totalCost)
+        public ForwardActionPlan(GoapGoal goal, Stack<GoapAction> actionStack, int totalCost, IWorldState worldState)
         {
             this.Goal = goal;
             this.TotalCost = totalCost;
-            this.Actions = new GoapAction[nodes.Count];
-            this.nodes = nodes;
-            ForwardNode[] nodeArray = nodes.ToArray();
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                Actions[i] = nodeArray[i].Action;
-            }
+            this.Actions = actionStack.ToArray();
+            this.actionStack = actionStack;
         }
 
         public GoapAction PopAction()
         {
-            if (!nodes.TryPop(out ForwardNode node)) 
+            if (!actionStack.TryPop(out GoapAction action)) 
                 return null;
             
-            TotalCost -= node.Cost;
-            return node.Action;
+            TotalCost -= action.CalculateCost(worldState);
+            return action;
 
         }
     }

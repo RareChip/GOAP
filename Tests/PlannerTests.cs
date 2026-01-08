@@ -35,7 +35,9 @@ namespace GOAP.Tests
             IGoapPlanner planner = TestUtils.GetPlanner();
             HashSet<GoapAction> actions = new HashSet<GoapAction>();
             IGoapActionBuilder builder = new GoapActionBuilder();
-            GoapGoal goal = new GoapGoal.Builder("BuildWallsGoal")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("BuildWallsGoal")
+                .WithInsistence(_ => 0)
                 .WithCondition("WallsBuilt", ConditionDirection.GreaterThanEq, 3)
                 .Build();
 
@@ -67,7 +69,9 @@ namespace GOAP.Tests
             IGoapPlanner planner = TestUtils.GetPlanner();
             HashSet<GoapAction> actions = new HashSet<GoapAction>();
             IGoapActionBuilder builder = new GoapActionBuilder();
-            GoapGoal goal = new GoapGoal.Builder("BuildWallsGoal")
+            IGoapGoalBuilder goalBuilder = new GoapGoalBuilder();
+            GoapGoal goal = goalBuilder.CreateGoal("BuildWallsGoal")
+                .WithInsistence(_ => 0)
                 .WithCondition("WallsBuilt", ConditionDirection.GreaterThanEq, 3)
                 .WithCondition("Prepared", true)
                 .Build();
@@ -104,7 +108,9 @@ namespace GOAP.Tests
             IGoapPlanner planner = TestUtils.GetPlanner();
             HashSet<GoapAction> actions = new HashSet<GoapAction>();
             IGoapActionBuilder builder = new GoapActionBuilder();
-            GoapGoal goal = new GoapGoal.Builder("BuildWallsGoal")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("BuildWallsGoal")
+                .WithInsistence(_ => 0)
                 .WithCondition("WallsBuilt", ConditionDirection.GreaterThanEq, 4)
                 .Build();
 
@@ -183,7 +189,9 @@ namespace GOAP.Tests
             worldData.Add("WoodCount", 0);
             worldData.Add("HasAxe", false);
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("CraftPickaxeGoal")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("CraftPickaxeGoal")
+                .WithInsistence(_ => 0)
                 .WithCondition("PickaxeCrafted", true)
                 .Build();
             HashSet<GoapAction> actions = GoapUtils.AddAllActions(
@@ -306,7 +314,9 @@ namespace GOAP.Tests
             };
 
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("WinGameGoal")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("WinGameGoal")
+                .WithInsistence(_ => 0)
                 .WithCondition("DragonHealth", ConditionDirection.LessThanEq, 0)
                 .WithCondition("InEnd", true)
                 .Build();
@@ -465,7 +475,9 @@ namespace GOAP.Tests
             };
 
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("WinGameGoal")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("WinGameGoal")
+                .WithInsistence(_ => 0)
                 .WithCondition("StickCount", ConditionDirection.GreaterThanEq, 10)
                 .Build();
             HashSet<GoapAction> actions = GoapUtils.AddAllActions(
@@ -600,7 +612,9 @@ namespace GOAP.Tests
             Dictionary<string, object> worldData = new() { { "Health", 0 } };
 
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("HealGoal")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("HealGoal")
+                .WithInsistence(_ => 0)
                 .WithCondition("Health", ConditionDirection.GreaterThanEq, 100)
                 .Build();
             HashSet<GoapAction> actions = GoapUtils.AddAllActions(
@@ -634,7 +648,9 @@ namespace GOAP.Tests
             worldData.Add("EnemyHealth", 100);
 
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("KillEnemy")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("KillEnemy")
+                .WithInsistence(_ => 0)
                 .WithCondition("EnemyHealth", ConditionDirection.LessThanEq, 0)
                 .Build();
             HashSet<GoapAction> actions = GoapUtils.AddAllActions(
@@ -669,7 +685,9 @@ namespace GOAP.Tests
             worldData.Add("HasBed", false);
             
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("HaveBothGoal")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("HaveBothGoal")
+                .WithInsistence(_ => 0)
                 .WithCondition("Money", ConditionDirection.GreaterThanEq, 20)
                 .WithCondition("HasBed", true)
                 .Build();
@@ -705,7 +723,9 @@ namespace GOAP.Tests
             worldData.Add("BossHealth", 50);
             
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("KillBoss")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("KillBoss")
+                .WithInsistence(_ => 0)
                 .WithCondition("BossHealth", ConditionDirection.LessThanEq, 0)
                 .WithCondition("Health", ConditionDirection.GreaterThanEq, 30f)
                 .Build();
@@ -751,7 +771,9 @@ namespace GOAP.Tests
             worldData.Add("IsWorthy", false);
             
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("KillTheBeast")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("KillTheBeast")
+                .WithInsistence(_ => 0)
                 .WithCondition("BeastHealth", ConditionDirection.LessThanEq, 0)
                 .Build();
 
@@ -777,7 +799,9 @@ namespace GOAP.Tests
             worldData.Add("HasTicket", false);
             
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("WinBig")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("WinBig")
+                .WithInsistence(_ => 0)
                 .WithCondition("Money", ConditionDirection.GreaterThanEq, 100)
                 .Build();
 
@@ -813,7 +837,9 @@ namespace GOAP.Tests
             worldData.Add("SnowmanCount", 3);
             
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("SummerTime")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("SummerTime")
+                .WithInsistence(_ => 0)
                 .WithCondition("Temp", ConditionDirection.GreaterThanEq, 80)
                 .WithCondition("IceCreamForSale", true)
                 .WithCondition("SnowmanCount", ConditionDirection.LessThanEq, 0)
@@ -859,7 +885,9 @@ namespace GOAP.Tests
             worldData.Add("Health", 10);
             
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("BeginBossFight")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("BeginBossFight")
+                .WithInsistence(_ => 0)
                 .WithCondition("AtBossLocation", true)
                 .WithCondition("Health", ConditionDirection.GreaterThanEq, 100)
                 .Build();
@@ -932,7 +960,9 @@ namespace GOAP.Tests
             worldData.Add("ByeBro", false);
 
             PlannerState worldState = new PlannerState(worldData);
-            GoapGoal goal = new GoapGoal.Builder("WinGameGoal")
+            GoapGoal goal = new GoapGoalBuilder()
+                .CreateGoal("WinGameGoal")
+                .WithInsistence(_ => 0)
                 .WithCondition("MonsterKilled", true)
                 //.WithCondition("InLair", true)
                 //.WithCondition("IsHungry", false)
