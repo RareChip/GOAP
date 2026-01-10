@@ -18,6 +18,9 @@ namespace GOAP.Runtime.Internal
 
         public GoapGoal GenerateBestGoal(ISet<GoapGoal> goals, IWorldState worldState)
         {
+            if (goals.Count == 0)
+                return null;
+            
             GoapGoal bestGoal = goals.OrderByDescending(x => x.CalculateInsistence).First();
             return bestGoal;
         }
