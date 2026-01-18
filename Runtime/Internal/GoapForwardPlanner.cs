@@ -21,7 +21,7 @@ namespace GOAP.Runtime.Internal
             if (goals.Count == 0)
                 return null;
             
-            GoapGoal bestGoal = goals.OrderByDescending(x => x.CalculateInsistence).First();
+            GoapGoal bestGoal = goals.OrderByDescending(x => x.CalculateInsistence(worldState)).First();
             return bestGoal;
         }
 

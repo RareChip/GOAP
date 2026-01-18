@@ -9,9 +9,9 @@ namespace GOAP.Runtime.Unity
     public abstract class GoapAgentConfiguration : ScriptableObject
     {
         [SerializeField] private int maxPlanLength = 20;
-        public abstract WorldState CreateWorldState();
-        public abstract ISet<GoapGoal> CreateGoals(IGoapGoalBuilder builder);
-        public abstract ISet<GoapAction> CreateActions(IGoapActionBuilder builder);
+        public abstract WorldState CreateWorldState(GoapAgent agent);
+        public abstract ISet<GoapGoal> CreateGoals(GoapAgent agent, IGoapGoalBuilder builder);
+        public abstract ISet<GoapAction> CreateActions(GoapAgent agent, IGoapActionBuilder builder);
         public virtual IGoapPlanner CreatePlanner() => new GoapForwardPlanner(maxPlanLength);
     }
 }

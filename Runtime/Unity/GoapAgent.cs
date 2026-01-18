@@ -9,6 +9,8 @@ namespace GOAP.Runtime.Unity
     {
         [SerializeField] private GoapAgentConfiguration goapConfiguration;
         [SerializeField] private float planningInterval = 0.5f;
+        [SerializeField] private bool startAutomatically = true;
+        
         [Header("Debugging"), SerializeField] private bool printPlan;
 
         private ISet<GoapAction> actions;
@@ -18,18 +20,23 @@ namespace GOAP.Runtime.Unity
         private GoapAction currentAction;
         private IActionPlan currentPlan;
         private float currentTime;
+        private bool canPlan;
 
         private void Awake()
         {
-            worldState = goapConfiguration.CreateWorldState();
-            actions = goapConfiguration.CreateActions(new GoapActionBuilder());
-            goals = goapConfiguration.CreateGoals(new GoapGoalBuilder());
+            worldState = goapConfiguration.CreateWorldState(this);
+            actions = goapConfiguration.CreateActions(this, new GoapActionBuilder());
+            goals = goapConfiguration.CreateGoals(this, new GoapGoalBuilder());
             planner = new MultithreadedPlanner(goapConfiguration.CreatePlanner(), actions, goals);
             currentTime = 0;
+            canPlan = startAutomatically;
         }
 
         private void Update()
         {
+            if (!canPlan)
+                return;
+            
             if (currentTime <= 0)
             {
                 RequestNewPlan();
@@ -48,7 +55,7 @@ namespace GOAP.Runtime.Unity
                     currentAction = currentPlan.PopAction();
                     currentAction?.StartAction();
                 }
-
+                
                 currentAction?.ExecuteAction();
             }
 
@@ -64,7 +71,9 @@ namespace GOAP.Runtime.Unity
             if (!shouldUseNewPlan)
                 return;
             currentPlan = newPlan;
-
+            currentAction?.StopAction();
+            currentAction = null;
+            
             if (printPlan)
                 PrintActionPlan();
         }
@@ -82,6 +91,11 @@ namespace GOAP.Runtime.Unity
             currentPlan = null;
             currentTime = planningInterval;
             RequestNewPlan();
+        }
+
+        public void EnablePlanning(bool shouldPlan)
+        {
+            canPlan = shouldPlan;
         }
 
         private void PrintActionPlan()

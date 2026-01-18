@@ -38,6 +38,17 @@ namespace GOAP.Runtime.Util
 
             return actionsSet;
         }
+        
+        public static HashSet<GoapGoal> AddAllGoals(params GoapGoal[] goals)
+        {
+            HashSet<GoapGoal> goalSet = new HashSet<GoapGoal>();
+            foreach (GoapGoal goal in goals)
+            {
+                goalSet.Add(goal);
+            }
+
+            return goalSet;
+        }
         public static bool VerifyCondition(GoapCondition condition)
         {
             switch (condition.GoapDataType)
