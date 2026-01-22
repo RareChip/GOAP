@@ -17,6 +17,7 @@ namespace GOAP.Runtime.Unity
         private ISet<GoapGoal> goals;
         private WorldState worldState;
         private MultithreadedPlanner planner;
+        private GoapGoal bestGoal;
         private GoapAction currentAction;
         private IActionPlan currentPlan;
         private float currentTime;
@@ -81,7 +82,7 @@ namespace GOAP.Runtime.Unity
         private void RequestNewPlan()
         {
             IWorldState worldStateSnapshot = worldState.CreateSnapshot();
-            GoapGoal bestGoal = planner.GetBestGoalMainThread(worldStateSnapshot);
+            bestGoal = planner.GetBestGoalMainThread(worldStateSnapshot);
 
             planner.SchedulePlanRequest(bestGoal, worldStateSnapshot);
         }
@@ -104,7 +105,7 @@ namespace GOAP.Runtime.Unity
 
             if (currentPlan == null)
             {
-                print($"No plan could be found!");
+                print($"No plan could be found for goal [{bestGoal.GoalName}]!");
                 return;
             }
             

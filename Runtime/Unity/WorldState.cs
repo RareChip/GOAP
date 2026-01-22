@@ -30,9 +30,11 @@ namespace GOAP.Runtime.Unity
 
         public void AddConditionData(string key, Func<object> getData)
         {
-            if (getData() is not int or float or bool)
+            Type t = getData().GetType();
+            if (t != typeof(int) && t != typeof(bool) && t != typeof(float))
             {
-                Debug.LogError("Only ints, float, bool, and enum types are supported in WorldState!");
+                Debug.LogError("Only ints, floats, bools, and enum types are supported in WorldState!" +
+                               $" Provided type: [{getData().GetType()}]");
                 return;
             }
             if (!data.TryAdd(key, getData))
