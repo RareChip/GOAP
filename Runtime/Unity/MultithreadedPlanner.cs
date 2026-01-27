@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GOAP.Runtime.API;
@@ -34,7 +35,12 @@ namespace GOAP.Runtime.Unity
 
         public bool GetNewPlanIfReady(out IActionPlan plan)
         {
-            if (planTask == null || !planTask.IsCompleted || planTask.IsCanceled || planTask.IsFaulted)
+            if (planTask != null && (planTask.IsCanceled || planTask.IsFaulted))
+            {
+                throw planTask.Exception?.InnerException ?? new Exception("Multithreaded planning failed!");
+            } 
+            
+            if (planTask == null || !planTask.IsCompleted)
             {
                 plan = null;
                 return false;
