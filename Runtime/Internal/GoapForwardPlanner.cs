@@ -10,10 +10,12 @@ namespace GOAP.Runtime.Internal
     public class GoapForwardPlanner : IGoapPlanner
     {
         private readonly int maxPlanLength;
+        private readonly bool returnShortPlan;
 
-        public GoapForwardPlanner(int maxPlanLength)
+        public GoapForwardPlanner(int maxPlanLength, bool returnShortPlan)
         {
             this.maxPlanLength = maxPlanLength;
+            this.returnShortPlan = returnShortPlan;
         }
 
         public GoapGoal GenerateBestGoal(ISet<GoapGoal> goals, IWorldState worldState)
@@ -53,17 +55,9 @@ namespace GOAP.Runtime.Internal
                     break;
                 }
 
-                if (allSatisfied)
+                if (allSatisfied || (returnShortPlan && current.CurrentPlanLength == this.maxPlanLength))
                 {
-                    Stack<GoapAction> path = new();
-                    int totalCost = current.Cost;
-                    while (current.ParentNode != null)
-                    {
-                        path.Push(current.Action);
-                        current = current.ParentNode;
-                    }
-
-                    return new ForwardActionPlan(goal, path, totalCost, worldState);
+                    return CreateActionPlan(goal, worldState, current);
                 }
 
                 if (current.CurrentPlanLength > this.maxPlanLength)
@@ -105,6 +99,19 @@ namespace GOAP.Runtime.Internal
             }
 
             return null;
+        }
+
+        private static IActionPlan CreateActionPlan(GoapGoal goal, IWorldState worldState, ForwardNode current)
+        {
+            Stack<GoapAction> path = new();
+            int totalCost = current.Cost;
+            while (current.ParentNode != null)
+            {
+                path.Push(current.Action);
+                current = current.ParentNode;
+            }
+
+            return new ForwardActionPlan(goal, path, totalCost, worldState);
         }
 
         private static int CalculateHeuristic(GoapCondition condition, IWorldState newState)

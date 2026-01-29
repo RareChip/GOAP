@@ -11,7 +11,7 @@ namespace GOAP.Tests
         private const int MAX_PLAN_LENGTH = 20;
         public static IGoapPlanner GetPlanner()
         {
-            return new GoapForwardPlanner(MAX_PLAN_LENGTH);
+            return new GoapForwardPlanner(MAX_PLAN_LENGTH, false);
         }
         public static void AssertPlanMakesSense(IActionPlan plan, PlannerState worldState, GoapGoal goal)
         {

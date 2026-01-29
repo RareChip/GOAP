@@ -17,7 +17,7 @@ namespace GOAP.Runtime.Core
             this.Value = value;
             this.ConditionDirection = conditionDirection;
         }
-
+        
         public override bool Equals(object obj)
         {
             if (obj is not GoapCondition other)
