@@ -3,9 +3,8 @@ using GOAP.Runtime.Core;
 
 namespace GOAP.Runtime.API
 {
-    public interface IGoapPlanner
+    public interface IActionPlanner
     {
-        public GoapGoal GenerateBestGoal(ISet<GoapGoal> goals, IWorldState worldState);
         public IActionPlan GeneratePlan(ISet<GoapAction> actions, GoapGoal goal, IWorldState worldState);
     }
 }

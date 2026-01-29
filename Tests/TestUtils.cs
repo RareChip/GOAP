@@ -9,7 +9,7 @@ namespace GOAP.Tests
     public static class TestUtils
     {
         private const int MAX_PLAN_LENGTH = 20;
-        public static IGoapPlanner GetPlanner()
+        public static IActionPlanner GetPlanner()
         {
             return new GoapForwardPlanner(MAX_PLAN_LENGTH, false);
         }

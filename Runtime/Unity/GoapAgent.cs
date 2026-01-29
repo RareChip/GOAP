@@ -16,7 +16,8 @@ namespace GOAP.Runtime.Unity
         private ISet<GoapAction> actions;
         private ISet<GoapGoal> goals;
         private WorldState worldState;
-        private MultithreadedPlanner planner;
+        private MultithreadedPlanner actionPlanner;
+        private IGoalPlanner goalPlanner;
         private GoapGoal bestGoal;
         private GoapAction currentAction;
         private IActionPlan currentPlan;
@@ -28,7 +29,8 @@ namespace GOAP.Runtime.Unity
             worldState = goapConfiguration.CreateWorldState(this);
             actions = goapConfiguration.CreateActions(this, new GoapActionBuilder());
             goals = goapConfiguration.CreateGoals(this, new GoapGoalBuilder());
-            planner = new MultithreadedPlanner(goapConfiguration.CreatePlanner(), actions, goals);
+            actionPlanner = new MultithreadedPlanner(goapConfiguration.CreateActionPlanner(), actions, goals);
+            goalPlanner = goapConfiguration.CreateGoalPlanner();
             currentTime = 0;
             canPlan = startAutomatically;
         }
@@ -60,7 +62,7 @@ namespace GOAP.Runtime.Unity
                 currentAction?.ExecuteAction();
             }
 
-            if (!planner.GetNewPlanIfReady(out IActionPlan newPlan))
+            if (!actionPlanner.GetNewPlanIfReady(out IActionPlan newPlan))
                 return;
 
             bool shouldUseNewPlan =
@@ -82,9 +84,9 @@ namespace GOAP.Runtime.Unity
         private void RequestNewPlan()
         {
             IWorldState worldStateSnapshot = worldState.CreateSnapshot();
-            bestGoal = planner.GetBestGoalMainThread(worldStateSnapshot);
+            bestGoal = goalPlanner.GenerateBestGoal(goals, worldStateSnapshot);
 
-            planner.SchedulePlanRequest(bestGoal, worldStateSnapshot);
+            actionPlanner.SchedulePlanRequest(bestGoal, worldStateSnapshot);
         }
 
         public void ForceReplan()

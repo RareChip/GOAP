@@ -14,7 +14,7 @@ namespace GOAP.Tests
         [Test]
         public void TestGeneratePlanNullInputs()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
 
             IActionPlan plan = planner.GeneratePlan(null, null, null);
             Assert.Null(plan);
@@ -32,7 +32,7 @@ namespace GOAP.Tests
         [Test]
         public void TestSimplePlan()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             HashSet<GoapAction> actions = new HashSet<GoapAction>();
             IGoapActionBuilder builder = new GoapActionBuilder();
             GoapGoal goal = new GoapGoalBuilder()
@@ -66,7 +66,7 @@ namespace GOAP.Tests
         [Test]
         public void TestSimplePlanTwoConditions()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             HashSet<GoapAction> actions = new HashSet<GoapAction>();
             IGoapActionBuilder builder = new GoapActionBuilder();
             IGoapGoalBuilder goalBuilder = new GoapGoalBuilder();
@@ -105,7 +105,7 @@ namespace GOAP.Tests
         [Test]
         public void TestComplexPlan()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             HashSet<GoapAction> actions = new HashSet<GoapAction>();
             IGoapActionBuilder builder = new GoapActionBuilder();
             GoapGoal goal = new GoapGoalBuilder()
@@ -175,7 +175,7 @@ namespace GOAP.Tests
         [Test]
         public void TestPlanLongRegression()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("PickaxeCrafted", false);
@@ -292,7 +292,7 @@ namespace GOAP.Tests
         [Test]
         public void TestExceedingLengthPlanFails()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new()
             {
@@ -453,7 +453,7 @@ namespace GOAP.Tests
         [Test]
         public void TestPlanManyActionsSimplePlan()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new()
             {
@@ -607,7 +607,7 @@ namespace GOAP.Tests
         [Test]
         public void TestPlanFindsEfficientPath()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new() { { "Health", 0 } };
 
@@ -642,7 +642,7 @@ namespace GOAP.Tests
         [Test]
         public void TestPlanFindsBestPath()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("EnemyHealth", 100);
@@ -678,7 +678,7 @@ namespace GOAP.Tests
         [Test]
         public void TestPlanContradictions()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("Money", 25);
@@ -716,7 +716,7 @@ namespace GOAP.Tests
         [Test]
         public void TestPlanMergingConditions()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("Health", 10f);
@@ -764,7 +764,7 @@ namespace GOAP.Tests
         [Test]
         public void TestPlanImpossible()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("BeastHealth", 10);
@@ -792,7 +792,7 @@ namespace GOAP.Tests
         [Test]
         public void TestInfinitePlanImpossible()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("Money", 10);
@@ -829,7 +829,7 @@ namespace GOAP.Tests
         [Test]
         public void TestPlanNegativeCondition()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("Temp", -20);
@@ -875,7 +875,7 @@ namespace GOAP.Tests
         [Test]
         public void TestFindsCheapestPathWithContradictions()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("AtBossLocation", true);
@@ -933,7 +933,7 @@ namespace GOAP.Tests
         [Test]
         public void TestPlanLongBooleansOnly()
         {
-            IGoapPlanner planner = TestUtils.GetPlanner();
+            IActionPlanner planner = TestUtils.GetPlanner();
             IGoapActionBuilder builder = new GoapActionBuilder();
             Dictionary<string, object> worldData = new Dictionary<string, object>();
             worldData.Add("MonsterKilled", false);

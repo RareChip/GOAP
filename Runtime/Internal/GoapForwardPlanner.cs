@@ -7,7 +7,7 @@ using GOAP.Runtime.Util;
 
 namespace GOAP.Runtime.Internal
 {
-    public class GoapForwardPlanner : IGoapPlanner
+    public class GoapForwardPlanner : IActionPlanner, IGoalPlanner
     {
         private readonly int maxPlanLength;
         private readonly bool returnShortPlan;

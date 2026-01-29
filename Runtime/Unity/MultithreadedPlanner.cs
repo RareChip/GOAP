@@ -8,22 +8,16 @@ namespace GOAP.Runtime.Unity
 {
     public class MultithreadedPlanner
     {
-        private readonly IGoapPlanner planner;
+        private readonly IActionPlanner actionPlanner;
         private readonly ISet<GoapAction> actions;
         private readonly ISet<GoapGoal> goals;
         private Task<IActionPlan> planTask;
-        public MultithreadedPlanner(IGoapPlanner planner, ISet<GoapAction> actions, ISet<GoapGoal> goals)
+        public MultithreadedPlanner(IActionPlanner planner, ISet<GoapAction> actions, ISet<GoapGoal> goals)
         {
-            this.planner = planner;
+            this.actionPlanner = planner;
             this.actions = actions;
             this.goals = goals;
         }
-
-        public GoapGoal GetBestGoalMainThread(IWorldState worldState)
-        {
-            return planner.GenerateBestGoal(goals, worldState);
-        }
-        
         public bool SchedulePlanRequest(GoapGoal goal, IWorldState worldState)
         {
             if (planTask != null)
@@ -54,7 +48,7 @@ namespace GOAP.Runtime.Unity
 
         private async Task<IActionPlan> GeneratePlanAsync(GoapGoal goal, IWorldState worldState)
         {
-            IActionPlan plan = await Task.Run(() => planner.GeneratePlan(actions, goal, worldState));
+            IActionPlan plan = await Task.Run(() => actionPlanner.GeneratePlan(actions, goal, worldState));
             return plan;
         }
     }

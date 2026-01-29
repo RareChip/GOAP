@@ -13,6 +13,7 @@ namespace GOAP.Runtime.Unity
         public abstract WorldState CreateWorldState(GoapAgent agent);
         public abstract ISet<GoapAction> CreateActions(GoapAgent agent, IGoapActionBuilder builder);
         public abstract ISet<GoapGoal> CreateGoals(GoapAgent agent, IGoapGoalBuilder builder);
-        public virtual IGoapPlanner CreatePlanner() => new GoapForwardPlanner(maxPlanLength, returnShortPlan);
+        public virtual IActionPlanner CreateActionPlanner() => new GoapForwardPlanner(maxPlanLength, returnShortPlan);
+        public virtual IGoalPlanner CreateGoalPlanner() => new GoapForwardPlanner(maxPlanLength, returnShortPlan);
     }
 }
